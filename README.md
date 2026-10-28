@@ -3,6 +3,10 @@
 Đồ án môn học, viết bằng C# (.NET 10) theo đúng tài liệu **PRD SportZone**: web cho khách hàng,
 ứng dụng desktop cho nhân viên và quản lý, dùng chung một cơ sở dữ liệu SQL Server.
 
+Link docs: https://docs.google.com/document/d/1kMyKTvmn33S6bsZioTueAmjSrR7KdsgkJRDUiG8j17I/edit?tab=t.0#heading=h.ut6dxxm6ubv0
+Link Excel Use cases: https://docs.google.com/spreadsheets/d/1dEZBH5jMHDfvMUY0FQuSr0y0DHqeV7s2D5Bw5SPLPnU/edit?gid=0#gid=0
+Link Excel Sreens: https://docs.google.com/spreadsheets/d/1BC80vjhIbL75g0hg_Jns7iRCQ8urxaTMsCEheNBINjw/edit?gid=1385038250#gid=1385038250
+
 ## 1. Cấu trúc Solution
 
 | Project | Loại | Nội dung |

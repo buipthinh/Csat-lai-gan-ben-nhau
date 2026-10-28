@@ -1,0 +1,67 @@
+@model DatSan
+@{
+    ViewData["Title"] = $"Đơn #DS{Model.MaDatSan}";
+    var duocHuy = (bool)ViewBag.DuocHuy;
+    var tienDv = Model.ChiTietDichVus.Sum(c => c.SoLuong * c.DonGia);
+}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h4 mb-0">Đơn #DS@(Model.MaDatSan)</h1>
+    <span class="badge text-bg-@WebHelpers.MauTrangThai(Model.TrangThai) fs-6">@Model.TrangThai</span>
+</div>
+<div class="row g-4">
+    <div class="col-lg-7">
+        <table class="table">
+            <tbody>
+            <tr><th scope="row" class="w-25">Sân</th><td>@Model.San?.TenSan <span class="text-muted">· @Model.San?.LoaiSan?.TenLoai</span></td></tr>
+            <tr><th scope="row">Thời gian</th><td>@Model.NgaySuDung.NgayDep(), @Model.GioBatDau.ToString("HH:mm") – @Model.GioKetThuc.ToString("HH:mm")</td></tr>
+            <tr><th scope="row">Ngày tạo đơn</th><td>@Model.NgayTao.ToString("dd/MM/yyyy HH:mm")</td></tr>
+            @if (Model.NhanVienXacNhan != null)
+            {
+                <tr><th scope="row">Nhân viên xác nhận</th><td>@Model.NhanVienXacNhan.HoTen</td></tr>
+            }
+            </tbody>
+        </table>
+        @if (Model.ChiTietDichVus.Any())
+        {
+            <h2 class="h6">Dịch vụ đã dùng</h2>
+            <table class="table table-sm">
+                <tbody>
+                @foreach (var c in Model.ChiTietDichVus)
+                {
+                    <tr><td>@c.DichVu?.TenDV</td><td class="text-end">@c.SoLuong @c.DichVu?.DonVi × @c.DonGia.Vnd()</td><td class="text-end">@((c.SoLuong * c.DonGia).Vnd())</td></tr>
+                }
+                </tbody>
+            </table>
+        }
+        @if (Model.HoaDon != null)
+        {
+            <div class="alert alert-success">
+                Đã thanh toán @Model.HoaDon.TongTien.Vnd() bằng @Model.HoaDon.PhuongThucTT lúc @Model.HoaDon.NgayLap.ToString("dd/MM/yyyy HH:mm") (hóa đơn #HD@(Model.HoaDon.MaHD)).
+            </div>
+        }
+    </div>
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-7">Tiền sân</dt><dd class="col-5 text-end">@Model.TienSan.Vnd()</dd>
+                    @if (tienDv > 0)
+                    {
+                        <dt class="col-7">Dịch vụ</dt><dd class="col-5 text-end">@tienDv.Vnd()</dd>
+                    }
+                    <dt class="col-7">Đã cọc</dt><dd class="col-5 text-end">@Model.TienCoc.Vnd()</dd>
+                    <dt class="col-7">Còn lại</dt><dd class="col-5 text-end fw-bold">@((Model.TienSan + tienDv - Model.TienCoc).Vnd())</dd>
+                </dl>
+            </div>
+        </div>
+        @if (duocHuy)
+        {
+            <form asp-action="Huy" method="post" class="mt-3" onsubmit="return confirm('Hủy đơn #DS@(Model.MaDatSan)? Tiền cọc xử lý theo chính sách của sân.');">
+                <input type="hidden" name="id" value="@Model.MaDatSan" />
+                <button class="btn btn-outline-danger w-100" type="submit">Hủy đơn này</button>
+            </form>
+            <p class="small text-muted mt-2">Chỉ hủy được khi còn hơn 3 giờ trước giờ chơi.</p>
+        }
+        <a class="btn btn-link w-100 mt-2" asp-action="LichSu">← Về lịch sử đặt sân</a>
+    </div>
+</div>

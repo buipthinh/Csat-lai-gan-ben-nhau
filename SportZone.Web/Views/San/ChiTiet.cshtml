@@ -1,0 +1,95 @@
+@model ChiTietSanVM
+@{
+    ViewData["Title"] = Model.San.TenSan;
+    var ngayStr = Model.Ngay.ToString("yyyy-MM-dd");
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a asp-controller="San" asp-action="Index">Danh sách sân</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.San.TenSan</li>
+    </ol>
+</nav>
+<div class="row g-4">
+    <div class="col-lg-5">
+        <img src="@WebHelpers.AnhSan(Model.San)" class="img-fluid rounded-3 mb-3" alt="" />
+        <h1 class="h4">@Model.San.TenSan</h1>
+        <p class="text-muted">@Model.San.LoaiSan?.TenLoai</p>
+        @if (!string.IsNullOrEmpty(Model.San.MoTa))
+        {
+            <p>@Model.San.MoTa</p>
+        }
+        @if (Model.San.TrangThai == TrangThaiSan.BaoTri)
+        {
+            <div class="alert alert-secondary">Sân đang bảo trì, tạm thời không nhận đặt.</div>
+        }
+        <h2 class="h6 mt-4">Bảng giá (đồng/giờ)</h2>
+        <table class="table table-sm">
+            <thead><tr><th scope="col">Khung giờ</th><th scope="col" class="text-end">Ngày thường</th><th scope="col" class="text-end">Cuối tuần</th></tr></thead>
+            <tbody>
+            @foreach (var kg in Model.KhungGios)
+            {
+                var thuong = Model.BangGia.FirstOrDefault(g => g.MaKhungGio == kg.MaKhungGio && !g.LaCuoiTuan);
+                var ct = Model.BangGia.FirstOrDefault(g => g.MaKhungGio == kg.MaKhungGio && g.LaCuoiTuan);
+                <tr>
+                    <td>@kg.TenKhungGio <span class="text-muted small">@kg.GioBatDau.ToString("HH:mm")–@kg.GioKetThuc.ToString("HH:mm")</span></td>
+                    <td class="text-end">@(thuong?.GiaMoiGio.Vnd() ?? "—")</td>
+                    <td class="text-end">@(ct?.GiaMoiGio.Vnd() ?? "—")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-lg-7">
+        <form class="row g-2 align-items-end mb-3" method="get">
+            <input type="hidden" name="id" value="@Model.San.MaSan" />
+            <div class="col-auto">
+                <label class="form-label small mb-1" for="ngay">Chọn ngày</label>
+                <input class="form-control" type="date" id="ngay" name="ngay" value="@ngayStr" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-auto"><button class="btn btn-outline-success" type="submit">Xem lịch</button></div>
+        </form>
+        <p class="small text-muted">Chọn giờ bắt đầu và giờ kết thúc trên lưới (block 30 phút, tối thiểu 1 giờ). Ô xám là đã có người đặt.</p>
+        <div class="sz-luoi mb-3">
+            @foreach (var o in Model.CacO)
+            {
+                var kha = !o.DaDat && !o.DaQua && Model.San.TrangThai == TrangThaiSan.HoatDong;
+                <button type="button" class="sz-o @(o.DaDat ? "dadat" : o.DaQua ? "daqua" : "trong")"
+                        data-gio="@o.Gio.ToString("HH:mm")" disabled="@(!kha)">
+                    @o.Gio.ToString("HH:mm")
+                </button>
+            }
+        </div>
+        <form id="formDat" asp-controller="DatSan" asp-action="XacNhan" method="get">
+            <input type="hidden" name="maSan" value="@Model.San.MaSan" />
+            <input type="hidden" name="ngay" value="@ngayStr" />
+            <div class="row g-2 align-items-end">
+                <div class="col-6 col-md-3">
+                    <label class="form-label small mb-1" for="gioBatDau">Giờ bắt đầu</label>
+                    <input class="form-control" type="time" step="1800" id="gioBatDau" name="gioBatDau" required />
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label small mb-1" for="gioKetThuc">Giờ kết thúc</label>
+                    <input class="form-control" type="time" step="1800" id="gioKetThuc" name="gioKetThuc" required />
+                </div>
+                <div class="col-12 col-md-4">
+                    <button class="btn btn-success w-100" type="submit" @(Model.San.TrangThai == TrangThaiSan.HoatDong ? "" : "disabled")>Tiếp tục đặt sân</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+<script>
+  // Nhấp vào ô giờ trong lưới để điền nhanh giờ bắt đầu / kết thúc
+  document.querySelectorAll('.sz-o.trong').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var bd = document.getElementById('gioBatDau'), kt = document.getElementById('gioKetThuc');
+      if (!bd.value || kt.value || btn.dataset.gio <= bd.value) { bd.value = btn.dataset.gio; kt.value = ''; }
+      else { kt.value = btn.dataset.gio; }
+      document.querySelectorAll('.sz-o').forEach(function (o) {
+        o.classList.toggle('chon', !!bd.value && o.dataset.gio >= bd.value && (!kt.value ? o.dataset.gio === bd.value : o.dataset.gio < kt.value));
+      });
+    });
+  });
+</script>
+}

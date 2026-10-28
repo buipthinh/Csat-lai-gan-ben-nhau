@@ -1,0 +1,28 @@
+@model ThongTinVM
+@{ ViewData["Title"] = "Thông tin cá nhân"; }
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <h1 class="h4 mb-3">Thông tin cá nhân</h1>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+            <div class="mb-3">
+                <label class="form-label" for="sdt">Số điện thoại</label>
+                <input class="form-control" id="sdt" value="@Model.SDT" disabled />
+                <div class="form-text">Số điện thoại là tên đăng nhập nên không thay đổi được.</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" asp-for="HoTen"></label>
+                <input class="form-control" asp-for="HoTen" />
+                <span class="text-danger small" asp-validation-for="HoTen"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" asp-for="Email"></label>
+                <input class="form-control" asp-for="Email" />
+                <span class="text-danger small" asp-validation-for="Email"></span>
+            </div>
+            <button class="btn btn-success" type="submit">Lưu thay đổi</button>
+            <a class="btn btn-link" asp-action="DoiMatKhau">Đổi mật khẩu</a>
+        </form>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

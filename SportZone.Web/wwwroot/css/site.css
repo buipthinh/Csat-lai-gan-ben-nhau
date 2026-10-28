@@ -1,0 +1,32 @@
+:root {
+  --sz-xanh: #2f8f5b;
+  --sz-xanh-dam: #237a4c;
+}
+
+html { font-size: 15px; }
+body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }
+
+.sz-nav { background: var(--sz-xanh-dam); }
+.sz-hero {
+  background: linear-gradient(135deg, var(--sz-xanh-dam), var(--sz-xanh));
+  color: #fff;
+}
+.sz-loai { background: #f4f7f5; border: 1px solid #e3eae6; color: inherit; }
+.sz-loai:hover { border-color: var(--sz-xanh); }
+.sz-card img { height: 120px; object-fit: cover; background: #eef2f0; }
+
+/* Lưới giờ của một sân trong ngày: mỗi ô là một block 30 phút */
+.sz-luoi { display: grid; grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); gap: 6px; }
+.sz-o {
+  border: 1px solid #cfd8d3; background: #fff; border-radius: 6px;
+  padding: 6px 2px; font-size: 13px; font-variant-numeric: tabular-nums;
+}
+.sz-o.trong:hover { border-color: var(--sz-xanh); background: #eef7f1; }
+.sz-o.chon { background: var(--sz-xanh); border-color: var(--sz-xanh); color: #fff; }
+.sz-o.dadat { background: #e9ecef; color: #868e96; }
+.sz-o.daqua { background: #f8f9fa; color: #adb5bd; }
+
+.btn-success, .btn-success:hover { background-color: var(--sz-xanh); border-color: var(--sz-xanh); }
+.btn-outline-success { color: var(--sz-xanh-dam); border-color: var(--sz-xanh); }
+.btn-outline-success:hover { background-color: var(--sz-xanh); border-color: var(--sz-xanh); }
+a { color: var(--sz-xanh-dam); }

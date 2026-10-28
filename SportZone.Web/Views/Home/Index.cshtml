@@ -1,0 +1,63 @@
+@model TrangChuVM
+@{ ViewData["Title"] = "Trang chủ"; }
+<section class="sz-hero rounded-4 p-4 p-md-5 mb-4">
+    <h1 class="display-6 fw-bold">Đặt sân thể thao trong 1 phút</h1>
+    <p class="lead mb-4">Bóng đá 5 và 7 người, cầu lông, pickleball, tennis. Xem giờ trống theo thời gian thực, đặt online, nhận xác nhận nhanh.</p>
+    <form class="row g-2 bg-white rounded-3 p-3 text-dark" asp-controller="San" asp-action="TimSanTrong" method="get">
+        <div class="col-12 col-md-3">
+            <label class="form-label small mb-1" for="maLoai">Môn</label>
+            <select class="form-select" id="maLoai" name="maLoai">
+                <option value="">Tất cả</option>
+                @foreach (var l in Model.LoaiSans)
+                {
+                    <option value="@l.MaLoai">@l.TenLoai</option>
+                }
+            </select>
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label small mb-1" for="ngay">Ngày</label>
+            <input class="form-control" type="date" id="ngay" name="ngay" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-3 col-md-2">
+            <label class="form-label small mb-1" for="bd">Từ</label>
+            <input class="form-control" type="time" step="1800" id="bd" name="gioBatDau" value="18:00" />
+        </div>
+        <div class="col-3 col-md-2">
+            <label class="form-label small mb-1" for="kt">Đến</label>
+            <input class="form-control" type="time" step="1800" id="kt" name="gioKetThuc" value="19:30" />
+        </div>
+        <div class="col-12 col-md-2 d-flex align-items-end">
+            <button class="btn btn-success w-100" type="submit">Tìm sân trống</button>
+        </div>
+    </form>
+</section>
+
+<h2 class="h5 mb-3">Các môn tại SportZone</h2>
+<div class="row g-3 mb-4">
+    @foreach (var l in Model.LoaiSans)
+    {
+        <div class="col-6 col-md-4 col-lg">
+            <a class="sz-loai d-block rounded-3 p-3 h-100 text-decoration-none" asp-controller="San" asp-action="Index" asp-route-maLoai="@l.MaLoai">
+                <strong class="d-block">@l.TenLoai</strong>
+                <span class="small text-muted">@Model.Sans.Count(s => s.MaLoai == l.MaLoai) sân · từ @(Model.GiaTu.TryGetValue(l.MaLoai, out var g) ? g.Vnd() : "—")</span>
+            </a>
+        </div>
+    }
+</div>
+
+<h2 class="h5 mb-3">Sân đang hoạt động</h2>
+<div class="row g-3">
+    @foreach (var s in Model.Sans.Take(8))
+    {
+        <div class="col-6 col-md-4 col-lg-3">
+            <partial name="_TheSan" model="(s, Model.GiaTu.TryGetValue(s.MaLoai, out var g) ? g : (decimal?)null)" />
+        </div>
+    }
+</div>
+<div class="text-center mt-3"><a asp-controller="San" asp-action="Index">Xem tất cả sân →</a></div>
+
+<section class="row g-3 mt-4 small">
+    <div class="col-md-4"><div class="p-3 border rounded-3 h-100"><strong>Giờ mở cửa</strong><br />5:00 – 23:00, đặt theo block 30 phút, tối thiểu 1 giờ.</div></div>
+    <div class="col-md-4"><div class="p-3 border rounded-3 h-100"><strong>Đặt cọc</strong><br />Đặt online cọc 30% tiền sân, phần còn lại thanh toán tại quầy.</div></div>
+    <div class="col-md-4"><div class="p-3 border rounded-3 h-100"><strong>Hủy sân</strong><br />Tự hủy trên web khi còn hơn 3 giờ trước giờ chơi.</div></div>
+</section>

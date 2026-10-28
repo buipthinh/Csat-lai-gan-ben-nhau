@@ -1,0 +1,27 @@
+@model DoiMatKhauVM
+@{ ViewData["Title"] = "Đổi mật khẩu"; }
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <h1 class="h4 mb-3">Đổi mật khẩu</h1>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+            <div class="mb-3">
+                <label class="form-label" asp-for="MatKhauCu"></label>
+                <input class="form-control" asp-for="MatKhauCu" autocomplete="current-password" />
+                <span class="text-danger small" asp-validation-for="MatKhauCu"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" asp-for="MatKhauMoi"></label>
+                <input class="form-control" asp-for="MatKhauMoi" autocomplete="new-password" />
+                <span class="text-danger small" asp-validation-for="MatKhauMoi"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" asp-for="NhapLai"></label>
+                <input class="form-control" asp-for="NhapLai" autocomplete="new-password" />
+                <span class="text-danger small" asp-validation-for="NhapLai"></span>
+            </div>
+            <button class="btn btn-success w-100" type="submit">Đổi mật khẩu</button>
+        </form>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

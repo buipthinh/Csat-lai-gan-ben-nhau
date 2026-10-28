@@ -1,0 +1,53 @@
+@model XacNhanDatVM
+@{ ViewData["Title"] = "Xác nhận đặt sân"; }
+<h1 class="h4 mb-3">Xác nhận đặt sân</h1>
+@if (Model.Loi != null)
+{
+    <div class="alert alert-warning">@Model.Loi</div>
+    <a class="btn btn-outline-success" asp-controller="San" asp-action="ChiTiet" asp-route-id="@Model.San.MaSan">Chọn giờ khác</a>
+}
+else
+{
+    var bg = Model.BaoGia!;
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <table class="table">
+                <tbody>
+                <tr><th scope="row" class="w-25">Sân</th><td>@Model.San.TenSan <span class="text-muted">· @Model.San.LoaiSan?.TenLoai</span></td></tr>
+                <tr><th scope="row">Ngày</th><td>@Model.Ngay.NgayDep() @(bg.LaCuoiTuan ? "(giá cuối tuần)" : "")</td></tr>
+                <tr><th scope="row">Giờ</th><td>@Model.GioBatDau.ToString("HH:mm") – @Model.GioKetThuc.ToString("HH:mm") (@((Model.GioKetThuc - Model.GioBatDau).TotalHours.ToString("0.#")) giờ)</td></tr>
+                </tbody>
+            </table>
+            <h2 class="h6">Chi tiết tiền sân</h2>
+            <table class="table table-sm">
+                <thead><tr><th scope="col">Khung giờ</th><th scope="col" class="text-end">Số giờ</th><th scope="col" class="text-end">Đơn giá</th><th scope="col" class="text-end">Thành tiền</th></tr></thead>
+                <tbody>
+                @foreach (var d in bg.ChiTiet)
+                {
+                    <tr><td>@d.TenKhungGio</td><td class="text-end">@d.SoGio.ToString("0.#")</td><td class="text-end">@d.DonGia.Vnd()</td><td class="text-end">@d.ThanhTien.Vnd()</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-body">
+                    <dl class="row mb-3">
+                        <dt class="col-7">Tiền sân</dt><dd class="col-5 text-end">@bg.TienSan.Vnd()</dd>
+                        <dt class="col-7">Đặt cọc (30%)</dt><dd class="col-5 text-end fw-bold text-success">@bg.TienCoc.Vnd()</dd>
+                        <dt class="col-7">Còn lại trả tại quầy</dt><dd class="col-5 text-end">@((bg.TienSan - bg.TienCoc).Vnd())</dd>
+                    </dl>
+                    <p class="small text-muted">Đơn sẽ ở trạng thái “Chờ xác nhận” đến khi nhân viên kiểm tra cọc. Bạn có thể tự hủy khi còn hơn 3 giờ trước giờ chơi.</p>
+                    <form asp-action="Dat" method="post">
+                        <input type="hidden" name="maSan" value="@Model.San.MaSan" />
+                        <input type="hidden" name="ngay" value="@Model.Ngay.ToString("yyyy-MM-dd")" />
+                        <input type="hidden" name="gioBatDau" value="@Model.GioBatDau.ToString("HH:mm")" />
+                        <input type="hidden" name="gioKetThuc" value="@Model.GioKetThuc.ToString("HH:mm")" />
+                        <button class="btn btn-success w-100" type="submit">Đặt sân</button>
+                    </form>
+                    <a class="btn btn-link w-100 mt-1" asp-controller="San" asp-action="ChiTiet" asp-route-id="@Model.San.MaSan" asp-route-ngay="@Model.Ngay.ToString("yyyy-MM-dd")">Chọn lại giờ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

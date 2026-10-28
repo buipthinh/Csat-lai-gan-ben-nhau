@@ -1,0 +1,28 @@
+@model List<DatSan>
+@{ ViewData["Title"] = "Lịch sử đặt sân"; }
+<h1 class="h4 mb-3">Lịch sử đặt sân</h1>
+@if (!Model.Any())
+{
+    <p class="text-muted">Bạn chưa có đơn đặt sân nào. <a asp-controller="San" asp-action="TimSanTrong">Tìm sân trống</a>.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th scope="col">Mã đơn</th><th scope="col">Sân</th><th scope="col">Thời gian</th><th scope="col" class="text-end">Tiền sân</th><th scope="col">Trạng thái</th><th scope="col"></th></tr></thead>
+            <tbody>
+            @foreach (var d in Model)
+            {
+                <tr>
+                    <td>#DS@(d.MaDatSan)</td>
+                    <td>@d.San?.TenSan<br /><span class="text-muted small">@d.San?.LoaiSan?.TenLoai</span></td>
+                    <td>@d.NgaySuDung.NgayDep()<br /><span class="text-muted small">@d.GioBatDau.ToString("HH:mm")–@d.GioKetThuc.ToString("HH:mm")</span></td>
+                    <td class="text-end">@d.TienSan.Vnd()</td>
+                    <td><span class="badge text-bg-@WebHelpers.MauTrangThai(d.TrangThai)">@d.TrangThai</span></td>
+                    <td class="text-end"><a class="btn btn-sm btn-outline-success" asp-action="ChiTiet" asp-route-id="@d.MaDatSan">Chi tiết</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

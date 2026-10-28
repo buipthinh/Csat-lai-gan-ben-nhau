@@ -3,6 +3,10 @@
 Đồ án môn học, viết bằng C# (.NET 10) theo đúng tài liệu **PRD SportZone**: web cho khách hàng,
 ứng dụng desktop cho nhân viên và quản lý, dùng chung một cơ sở dữ liệu SQL Server.
 
+- Link docs: https://docs.google.com/document/d/1kMyKTvmn33S6bsZioTueAmjSrR7KdsgkJRDUiG8j17I/edit?tab=t.0#heading=h.ut6dxxm6ubv0
+- Link Excel Use cases: https://docs.google.com/spreadsheets/d/1dEZBH5jMHDfvMUY0FQuSr0y0DHqeV7s2D5Bw5SPLPnU/edit?gid=0#gid=0
+- Link Excel Sreens: https://docs.google.com/spreadsheets/d/1BC80vjhIbL75g0hg_Jns7iRCQ8urxaTMsCEheNBINjw/edit?gid=1385038250#gid=1385038250
+
 ## 1. Cấu trúc Solution
 
 | Project | Loại | Nội dung |
@@ -10,7 +14,7 @@
 | `SportZone.Data` | Class Library | 12 entity theo lược đồ quan hệ, `SportZoneDbContext` (EF Core), ràng buộc, migration |
 | `SportZone.Business` | Class Library | Toàn bộ quy tắc nghiệp vụ BR01–BR10 và các service dùng chung cho cả hai ứng dụng |
 | `SportZone.Web` | ASP.NET Core MVC | Giao diện khách hàng (UC01–UC11) |
-| `SportZone.Desktop` | WinForms | Giao diện nhân viên và quản lý (UC12–UC29) |
+| `SportZone.Desktop` | WinForms | Giao diện nhân viên và quản lý (UC12–UC31) |
 | `SportZone.Tests` | xUnit | 40 test cho các quy tắc nghiệp vụ |
 | `Database/` | Script SQL | `SportZone_Database.sql`: tạo database, 12 bảng, ràng buộc, dữ liệu mẫu, view báo cáo |
 
@@ -89,7 +93,7 @@ tự làm mới mỗi 30 giây, nhấp đúp để mở đơn), đặt sân tạ
 check-in, thêm dịch vụ, thanh toán và in hóa đơn (xem trước bằng `PrintDocument`), quản lý khách hàng.
 
 **Desktop (thêm cho quản lý):** loại sân, sân kèm chuyển bảo trì, khung giờ, bảng giá, dịch vụ,
-tài khoản nhân viên, và thống kê doanh thu theo ngày (biểu đồ cột vẽ bằng GDI+).
+tài khoản nhân viên, và thống kê doanh thu, tỉ lệ lấp đầy, khung giờ đông khách (biểu đồ cột vẽ bằng GDI+).
 
 ## 6. Ghi chú kỹ thuật
 
@@ -98,3 +102,5 @@ tài khoản nhân viên, và thống kê doanh thu theo ngày (biểu đồ c�
   và WinForms (một tiến trình lâu dài).
 - Đơn giá dịch vụ được **chụp lại lúc bán** (`ChiTietDichVu.DonGia`), đổi giá sau này không làm sai hóa đơn cũ.
 - Giao diện WinForms viết hoàn toàn bằng code (không dùng file Designer) để dễ đọc và dễ so sánh khi làm nhóm.
+
+

@@ -1,13 +1,10 @@
 # SportZone — Hệ thống đặt sân thể thao
 
-Đồ án môn học, viết bằng C# (.NET 10) theo đúng tài liệu **PRD SportZone**: web cho khách hàng,
-ứng dụng desktop cho nhân viên và quản lý, dùng chung một cơ sở dữ liệu SQL Server.
-
 - Link docs: https://docs.google.com/document/d/1kMyKTvmn33S6bsZioTueAmjSrR7KdsgkJRDUiG8j17I/edit?tab=t.0#heading=h.ut6dxxm6ubv0
 - Link Excel Use cases: https://docs.google.com/spreadsheets/d/1dEZBH5jMHDfvMUY0FQuSr0y0DHqeV7s2D5Bw5SPLPnU/edit?gid=0#gid=0
 - Link Excel Sreens: https://docs.google.com/spreadsheets/d/1BC80vjhIbL75g0hg_Jns7iRCQ8urxaTMsCEheNBINjw/edit?gid=1385038250#gid=1385038250
 
-## 1. Cấu trúc Solution
+## 1. Cấu trúc
 
 | Project | Loại | Nội dung |
 |---|---|---|
@@ -16,10 +13,7 @@
 | `SportZone.Web` | ASP.NET Core MVC | Giao diện khách hàng (UC01–UC11) |
 | `SportZone.Desktop` | WinForms | Giao diện nhân viên và quản lý (UC12–UC31) |
 | `SportZone.Tests` | xUnit | 40 test cho các quy tắc nghiệp vụ |
-| `Database/` | Script SQL | `SportZone_Database.sql`: tạo database, 12 bảng, ràng buộc, dữ liệu mẫu, view báo cáo |
-
-Web và Desktop **không truy cập cơ sở dữ liệu trực tiếp**, chỉ gọi service trong `SportZone.Business`,
-nên một quy tắc nghiệp vụ chỉ được viết một lần (ví dụ cách tính tiền, cách kiểm tra trùng lịch).
+| `Database/` | Script SQL | `Database.sql`: tạo database, 12 bảng, ràng buộc, dữ liệu mẫu, view báo cáo |
 
 ## 2. Yêu cầu môi trường
 
@@ -29,18 +23,16 @@ nên một quy tắc nghiệp vụ chỉ được viết một lần (ví dụ c
 
 ## 3. Cách chạy
 
-1. Mở `SportZone.sln` bằng Visual Studio.
+1. Mở `SportZone` bằng Visual Studio.
 2. Kiểm tra chuỗi kết nối trong `SportZone.Web/appsettings.json` và `SportZone.Desktop/appsettings.json`:
 
    ```json
    "ConnectionStrings": { "SportZone": "Server=(localdb)\\MSSQLLocalDB;Database=SportZone;Trusted_Connection=True;TrustServerCertificate=True" }
    ```
 
-3. Tạo database theo **một trong hai cách**:
-   - **Cách A (khuyên dùng khi nộp bài):** mở `Database/SportZone_Database.sql` trong SQL Server Management Studio,
+3. Tạo database: Mở `Database/SportZone_Database.sql` trong SQL Server Management Studio,
      kết nối `(localdb)\MSSQLLocalDB`, bấm Execute. Script tạo database `SportZone`, 12 bảng và dữ liệu mẫu,
      ngày của các đơn tính theo ngày bạn chạy script.
-   - **Cách B:** bỏ qua bước này, chương trình **tự tạo cơ sở dữ liệu và nạp dữ liệu mẫu** ở lần chạy đầu.
 4. Chạy `SportZone.Web` (hoặc `SportZone.Desktop`). Dữ liệu mẫu gồm: 13 sân thuộc 5 loại, bảng giá, dịch vụ, khách hàng và khoảng 30 ngày đơn đặt sân
    để màn hình thống kê có số liệu.
 5. Muốn chạy hai ứng dụng cùng lúc: nhấp phải Solution → *Set Startup Projects* → *Multiple startup projects*,
@@ -54,10 +46,6 @@ nên một quy tắc nghiệp vụ chỉ được viết một lần (ví dụ c
 | Desktop | `nhanvien` | `nv123456` | Nhân viên (chỉ đặt sân, khách hàng) |
 | Web | `0901234567` | `123456` | Khách hàng Lê Minh Khoa |
 | Web | `0912345678` | `123456` | Khách hàng Phạm Thu Hà |
-
-### Chạy bằng SQLite (khi máy chưa có SQL Server)
-
-Đổi `"DatabaseProvider"` thành `"Sqlite"` và chuỗi kết nối thành `"Data Source=sportzone.db"`.
 
 ### Chạy test
 
@@ -79,7 +67,7 @@ dotnet test SportZone.Tests
 | BR09 | Đặt online cọc 30%, làm tròn nghìn | `QuyTac.TinhCoc` |
 | BR10 | Tài khoản bị khóa không đăng nhập được; menu lọc theo vai trò | `TaiKhoanService`, `FrmMain` |
 
-Trạng thái đơn đi theo đúng vòng: **Chờ xác nhận → Đã xác nhận → Đang chơi → Hoàn thành**, hoặc **Đã hủy**.
+Trạng thái đơn đi theo đúng vòng: **Chờ xác nhận -> Đã xác nhận -> Đang chơi -> Hoàn thành**, hoặc **Đã hủy**.
 Đơn đặt tại quầy được xác nhận ngay và không thu cọc.
 
 ## 5. Màn hình chính

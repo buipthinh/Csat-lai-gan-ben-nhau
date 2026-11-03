@@ -1,29 +1,13 @@
 ﻿/* =====================================================================
-   SPORTZONE - SCRIPT TẠO CƠ SỞ DỮ LIỆU (SQL Server 2019 trở lên / LocalDB)
-   ---------------------------------------------------------------------
-   Nội dung:
-     Phần 1. Tạo database SportZone
-     Phần 2. Tạo 12 bảng, khóa chính, khóa ngoại, UNIQUE, CHECK, index
-             (sinh từ migration EF Core "KhoiTao", khớp 100% với code C#)
-     Phần 3. Dữ liệu mẫu: 2 vai trò, 2 nhân viên, 4 khách hàng, 5 loại sân,
-             13 sân, 3 khung giờ, 30 mức giá, 6 dịch vụ, 766 đơn đặt sân,
-             647 hóa đơn. Ngày của đơn được tính tương đối so với ngày chạy
-             script (30 ngày trước đến 3 ngày sau) nên luôn có số liệu mới.
-     Phần 4. View phục vụ báo cáo và câu lệnh kiểm tra
-
-   Tài khoản mẫu (mật khẩu đã băm BCrypt trong bảng):
-     Desktop: admin / admin123 (Quản lý)    nhanvien / nv123456 (Nhân viên)
-     Web    : 0901234567 / 123456           0912345678 / 123456
-
-   Cách chạy: mở file trong SQL Server Management Studio (hoặc Azure Data
-   Studio), kết nối tới (localdb)\MSSQLLocalDB, bấm Execute (F5).
-   Nếu muốn tạo lại từ đầu, bỏ chú thích 3 dòng DROP ở Phần 1.
-   ===================================================================== */
+Tài khoản mẫu (mật khẩu đã băm BCrypt trong bảng):
+Desktop: admin / admin123 (Quản lý) - nhanvien / nv123456 (Nhân viên)
+Web: 0901234567 / 123456 - 0912345678 / 123456
+===================================================================== */
 
 SET NOCOUNT ON;
 GO
 
-/* ---------------- PHẦN 1. TẠO DATABASE ---------------- */
+/*TẠO DATABASE*/
 USE master;
 GO
 -- IF DB_ID(N'SportZone') IS NOT NULL
@@ -32,8 +16,8 @@ GO
 GO
 IF DB_ID(N'SportZone') IS NOT NULL
 BEGIN
-    RAISERROR(N'Database SportZone đã tồn tại. Bỏ chú thích các dòng DROP ở Phần 1 nếu muốn tạo lại.', 16, 1);
-    SET NOEXEC ON;   -- dừng toàn bộ script, không đụng vào dữ liệu đang có
+    RAISERROR(N'Database SportZone đã tồn tại.', 16, 1);
+    SET NOEXEC ON;
 END
 GO
 CREATE DATABASE SportZone COLLATE Vietnamese_CI_AS;
@@ -41,7 +25,7 @@ GO
 USE SportZone;
 GO
 
-/* ---------------- PHẦN 2. TẠO BẢNG ---------------- */
+/*TẠO BẢNG*/
 IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
 BEGIN
     CREATE TABLE [__EFMigrationsHistory] (
@@ -220,7 +204,7 @@ VALUES (N'20261026150259_KhoiTao', N'10.0.14');
 COMMIT;
 GO
 
-/* ---------------- PHẦN 3. DỮ LIỆU MẪU ---------------- */
+/*DỮ LIỆU MẪU*/
 BEGIN TRANSACTION;
 DECLARE @HomNay date = CAST(GETDATE() AS date);
 
@@ -2145,7 +2129,7 @@ SET IDENTITY_INSERT [HoaDon] OFF;
 COMMIT;
 GO
 
-/* ---------------- PHẦN 4. VIEW BÁO CÁO ---------------- */
+/*VIEW BÁO CÁO */
 
 -- Doanh thu theo ngày (UC29): doanh thu = tiền sân + dịch vụ, ghi trong HoaDon.TongTien
 CREATE VIEW vw_DoanhThuTheoNgay AS
@@ -2168,7 +2152,7 @@ JOIN KhachHang k ON k.MaKH = d.MaKH
 WHERE d.TrangThai <> N'Đã hủy';
 GO
 
-/* ---------------- KIỂM TRA SAU KHI CHẠY ---------------- */
+/*KIỂM TRA SAU KHI CHẠY*/
 SELECT 'VaiTro' AS Bang, COUNT(*) AS SoDong FROM VaiTro
 UNION ALL SELECT 'NhanVien', COUNT(*) FROM NhanVien
 UNION ALL SELECT 'KhachHang', COUNT(*) FROM KhachHang

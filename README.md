@@ -4,7 +4,7 @@
 - Link Excel Use cases: https://docs.google.com/spreadsheets/d/1dEZBH5jMHDfvMUY0FQuSr0y0DHqeV7s2D5Bw5SPLPnU/edit?gid=0#gid=0
 - Link Excel Sreens: https://docs.google.com/spreadsheets/d/1BC80vjhIbL75g0hg_Jns7iRCQ8urxaTMsCEheNBINjw/edit?gid=1385038250#gid=1385038250
 
-## 1. Cấu trúc
+## 1. Cấu trúc solutions
 
 | Project | Loại | Nội dung |
 |---|---|---|

@@ -30,3 +30,11 @@ body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }
 .btn-outline-success { color: var(--sz-xanh-dam); border-color: var(--sz-xanh); }
 .btn-outline-success:hover { background-color: var(--sz-xanh); border-color: var(--sz-xanh); }
 a { color: var(--sz-xanh-dam); }
+
+/* Bootstrap 5.1 trong wwwroot/lib chưa có lớp text-bg-* (thêm từ 5.2), khai báo lại để badge trạng thái hiện màu */
+.text-bg-primary { color: #fff !important; background-color: #0d6efd !important; }
+.text-bg-secondary { color: #fff !important; background-color: #6c757d !important; }
+.text-bg-success { color: #fff !important; background-color: #198754 !important; }
+.text-bg-info { color: #000 !important; background-color: #0dcaf0 !important; }
+.text-bg-warning { color: #000 !important; background-color: #ffc107 !important; }
+.text-bg-danger { color: #fff !important; background-color: #dc3545 !important; }

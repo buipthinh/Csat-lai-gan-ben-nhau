@@ -175,10 +175,17 @@ public class DatSanService
         return KetQua.Ok(thongBao);
     }
 
-    // UC17
-    public KetQua XacNhan(int maDon, int maNV) =>
-        DoiTrangThai(maDon, new[] { TrangThaiDon.ChoXacNhan },
-            d => { d.TrangThai = TrangThaiDon.DaXacNhan; d.MaNVXacNhan = maNV; }, "Đã xác nhận đơn.");
+    // UC17: với đơn online, nhân viên chỉ xác nhận sau khi thấy tiền cọc đã về tài khoản
+    // (đối chiếu số tiền và nội dung chuyển khoản DSxxx). Xác nhận cũng là ghi nhận đã nhận cọc.
+    public KetQua XacNhan(int maDon, int maNV)
+    {
+        var don = ChiTiet(maDon);
+        var thongBao = don is { TienCoc: > 0 }
+            ? $"Đã ghi nhận tiền cọc {don.TienCoc.ToString("#,##0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))} đ và xác nhận đơn #DS{maDon}."
+            : "Đã xác nhận đơn.";
+        return DoiTrangThai(maDon, new[] { TrangThaiDon.ChoXacNhan },
+            d => { d.TrangThai = TrangThaiDon.DaXacNhan; d.MaNVXacNhan = maNV; }, thongBao);
+    }
 
     public KetQua TuChoi(int maDon, int maNV) =>
         DoiTrangThai(maDon, new[] { TrangThaiDon.ChoXacNhan },

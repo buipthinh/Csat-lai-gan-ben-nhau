@@ -3,6 +3,11 @@
     ViewData["Title"] = $"Đơn #DS{Model.MaDatSan}";
     var duocHuy = (bool)ViewBag.DuocHuy;
     var tienDv = Model.ChiTietDichVus.Sum(c => c.SoLuong * c.DonGia);
+    var anhQr = ViewBag.AnhQr as string;
+    var tk = ViewBag.TaiKhoanCoc as SportZone.Business.TaiKhoanNhanCoc;
+    var noiDungCk = SportZone.Business.VietQR.NoiDungChuyenKhoan(Model.MaDatSan);
+    // Đơn online chờ xác nhận nghĩa là sân chưa nhận được tiền cọc
+    var choCoc = Model.TrangThai == TrangThaiDon.ChoXacNhan && Model.TienCoc > 0;
 }
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <h1 class="h4 mb-0">Đơn #DS@(Model.MaDatSan)</h1>
@@ -49,11 +54,42 @@
                     {
                         <dt class="col-7">Dịch vụ</dt><dd class="col-5 text-end">@tienDv.Vnd()</dd>
                     }
-                    <dt class="col-7">Đã cọc</dt><dd class="col-5 text-end">@Model.TienCoc.Vnd()</dd>
+                    @if (choCoc)
+                    {
+                        <dt class="col-7">Tiền cọc <span class="badge text-bg-warning fw-normal">chưa nhận</span></dt><dd class="col-5 text-end">@Model.TienCoc.Vnd()</dd>
+                    }
+                    else if (Model.TienCoc > 0)
+                    {
+                        <dt class="col-7">Đã cọc <span class="badge text-bg-success fw-normal">đã nhận</span></dt><dd class="col-5 text-end">@Model.TienCoc.Vnd()</dd>
+                    }
                     <dt class="col-7">Còn lại</dt><dd class="col-5 text-end fw-bold">@((Model.TienSan + tienDv - Model.TienCoc).Vnd())</dd>
                 </dl>
             </div>
         </div>
+        @if (anhQr != null && tk != null)
+        {
+            <div class="card mt-3 border-warning" id="the-chuyen-coc">
+                <div class="card-body text-center">
+                    <h2 class="h6 mb-1">Quét mã để chuyển tiền cọc</h2>
+                    <p class="small text-muted mb-2">Mở app ngân hàng bất kỳ và quét mã. Số tiền và nội dung đã điền sẵn.</p>
+                    <img src="@anhQr" alt="Mã VietQR chuyển cọc đơn #DS@(Model.MaDatSan)" class="img-fluid border rounded" style="max-width:240px" />
+                    <dl class="row text-start small mt-3 mb-0">
+                        <dt class="col-5">Ngân hàng</dt><dd class="col-7">@tk.TenNganHang</dd>
+                        <dt class="col-5">Số tài khoản</dt><dd class="col-7">@tk.SoTaiKhoan <button type="button" class="btn btn-link btn-sm p-0 ms-1" data-sao-chep="@tk.SoTaiKhoan">Sao chép</button></dd>
+                        <dt class="col-5">Chủ tài khoản</dt><dd class="col-7">@tk.TenTaiKhoan</dd>
+                        <dt class="col-5">Số tiền</dt><dd class="col-7 fw-bold">@Model.TienCoc.Vnd()</dd>
+                        <dt class="col-5">Nội dung</dt><dd class="col-7 fw-bold">@noiDungCk <button type="button" class="btn btn-link btn-sm p-0 ms-1" data-sao-chep="@noiDungCk">Sao chép</button></dd>
+                    </dl>
+                    <div class="alert alert-warning small text-start mt-3 mb-0">
+                        Giữ đúng nội dung <strong>@noiDungCk</strong> để sân đối chiếu. Khi nhân viên nhận được tiền và xác nhận, đơn chuyển sang <strong>Đã xác nhận</strong> và trang này tự cập nhật.
+                    </div>
+                </div>
+            </div>
+        }
+        else if (choCoc)
+        {
+            <div class="alert alert-warning mt-3 small">Vui lòng chuyển cọc @Model.TienCoc.Vnd() với nội dung <strong>@noiDungCk</strong>. Liên hệ hotline nếu cần số tài khoản.</div>
+        }
         @if (duocHuy)
         {
             <form asp-action="Huy" method="post" class="mt-3" onsubmit="return confirm('Hủy đơn #DS@(Model.MaDatSan)? Tiền cọc xử lý theo chính sách của sân.');">
@@ -65,3 +101,25 @@
         <a class="btn btn-link w-100 mt-2" asp-action="LichSu">← Về lịch sử đặt sân</a>
     </div>
 </div>
+@section Scripts {
+    @if (choCoc)
+    {
+        <script>
+            // Sao chép số tài khoản, nội dung chuyển khoản
+            document.querySelectorAll('[data-sao-chep]').forEach(function (nut) {
+                nut.addEventListener('click', function () {
+                    navigator.clipboard.writeText(nut.dataset.saoChep).then(function () {
+                        nut.textContent = 'Đã chép';
+                        setTimeout(function () { nut.textContent = 'Sao chép'; }, 1500);
+                    });
+                });
+            });
+            // Hỏi trạng thái mỗi 10 giây, nhân viên xác nhận xong thì tải lại trang
+            setInterval(function () {
+                fetch('@Url.Action("TrangThai", new { id = Model.MaDatSan })', { cache: 'no-store' })
+                    .then(function (r) { return r.ok ? r.json() : null; })
+                    .then(function (d) { if (d && !d.dangChoCoc) location.reload(); });
+            }, 10000);
+        </script>
+    }
+}

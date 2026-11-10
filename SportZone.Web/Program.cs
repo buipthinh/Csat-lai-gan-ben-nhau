@@ -5,6 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSportZone(builder.Configuration);
+// Tài khoản nhận tiền cọc, dùng để tạo mã VietQR trên trang chi tiết đơn
+builder.Services.AddSingleton(builder.Configuration.GetSection("ChuyenKhoan").Get<TaiKhoanNhanCoc>() ?? new TaiKhoanNhanCoc());
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>
     {

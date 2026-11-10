@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportZone.Business;
 using SportZone.Business.Services;
+using SportZone.Data.Entities;
 using SportZone.Web.Infrastructure;
 using SportZone.Web.Models;
+using QRCoder;
 
 namespace SportZone.Web.Controllers;
 
@@ -13,12 +15,14 @@ public class DatSanController : Controller
     private readonly DatSanService _datSan;
     private readonly GiaService _gia;
     private readonly DanhMucService _danhMuc;
+    private readonly TaiKhoanNhanCoc _taiKhoanCoc;
 
-    public DatSanController(DatSanService datSan, GiaService gia, DanhMucService danhMuc)
+    public DatSanController(DatSanService datSan, GiaService gia, DanhMucService danhMuc, TaiKhoanNhanCoc taiKhoanCoc)
     {
         _datSan = datSan;
         _gia = gia;
         _danhMuc = danhMuc;
+        _taiKhoanCoc = taiKhoanCoc;
     }
 
     // UC08 bước 1: xem lại giờ đã chọn và tiền (UC33) trước khi xác nhận
@@ -49,7 +53,7 @@ public class DatSanController : Controller
             TempData["Loi"] = kq.ThongBao;
             return RedirectToAction("ChiTiet", "San", new { id = maSan, ngay = ngay.ToString("yyyy-MM-dd") });
         }
-        TempData["ThongBao"] = $"Đặt sân thành công! Đơn #DS{kq.DuLieu!.MaDatSan} đang chờ nhân viên xác nhận. Vui lòng chuyển cọc {kq.DuLieu.TienCoc.Vnd()}.";
+        TempData["ThongBao"] = $"Đặt sân thành công! Đơn #DS{kq.DuLieu!.MaDatSan} đã được giữ chỗ. Vui lòng quét mã QR bên dưới để chuyển cọc {kq.DuLieu.TienCoc.Vnd()}.";
         return RedirectToAction(nameof(ChiTiet), new { id = kq.DuLieu.MaDatSan });
     }
 
@@ -62,7 +66,25 @@ public class DatSanController : Controller
         var don = _datSan.ChiTiet(id);
         if (don == null || don.MaKH != User.MaKH()) return NotFound();
         ViewBag.DuocHuy = _datSan.KhachDuocHuy(don);
+        if (don.TrangThai == TrangThaiDon.ChoXacNhan && don.TienCoc > 0 && _taiKhoanCoc.DayDu)
+        {
+            // Mã VietQR có sẵn số tiền cọc và nội dung DSxxx, khách quét bằng app ngân hàng bất kỳ
+            var chuoi = VietQR.TaoChuoi(_taiKhoanCoc.MaNganHang, _taiKhoanCoc.SoTaiKhoan, don.TienCoc,
+                                        VietQR.NoiDungChuyenKhoan(don.MaDatSan));
+            using var ma = new QRCodeGenerator().CreateQrCode(chuoi, QRCodeGenerator.ECCLevel.M);
+            ViewBag.AnhQr = "data:image/png;base64," + Convert.ToBase64String(new PngByteQRCode(ma).GetGraphic(8));
+            ViewBag.TaiKhoanCoc = _taiKhoanCoc;
+        }
         return View(don);
+    }
+
+    // Trang chi tiết hỏi định kỳ để tự tải lại khi nhân viên xác nhận đã nhận cọc
+    [HttpGet]
+    public IActionResult TrangThai(int id)
+    {
+        var don = _datSan.ChiTiet(id);
+        if (don == null || don.MaKH != User.MaKH()) return NotFound();
+        return Json(new { trangThai = don.TrangThai, dangChoCoc = don.TrangThai == TrangThaiDon.ChoXacNhan });
     }
 
     // UC11 Hủy đặt sân

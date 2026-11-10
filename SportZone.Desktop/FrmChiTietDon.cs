@@ -56,7 +56,13 @@ public class FrmChiTietDon : Form
         foreach (var c in _don.ChiTietDichVus)
             Dong("  " + c.DichVu?.TenDV, $"{c.SoLuong} {c.DichVu?.DonVi} × {c.DonGia.Vnd()} = {(c.SoLuong * c.DonGia).Vnd()}");
         Dong("Tổng giá trị", tamTinh.TongGiaTri.Vnd());
-        Dong("Đã cọc", tamTinh.TienCoc.Vnd());
+        if (_don.TienCoc > 0)
+        {
+            var daNhan = _don.TrangThai != TrangThaiDon.ChoXacNhan && _don.TrangThai != TrangThaiDon.DaHuy;
+            Dong("Tiền cọc", $"{tamTinh.TienCoc.Vnd()} · {(daNhan ? "đã nhận" : "chưa nhận")}");
+            Dong("Nội dung CK", VietQR.NoiDungChuyenKhoan(_don.MaDatSan));
+        }
+        else Dong("Tiền cọc", "Không thu cọc");
         Dong("Còn phải trả", tamTinh.PhaiTra.Vnd());
         if (_don.HoaDon != null)
             Dong("Hóa đơn", $"#HD{_don.HoaDon.MaHD} · {_don.HoaDon.PhuongThucTT} · {_don.HoaDon.NgayLap:dd/MM/yyyy HH:mm}");
@@ -79,7 +85,8 @@ public class FrmChiTietDon : Form
         switch (_don!.TrangThai)
         {
             case TrangThaiDon.ChoXacNhan:
-                Them("Xác nhận đơn", () => Lam(Program.Lay<DatSanService>().XacNhan(_maDon, PhienDangNhap.MaNV)), chinh: true);
+                if (_don.TienCoc > 0) Them("Đã nhận cọc", XacNhanDaNhanCoc, chinh: true);
+                else Them("Xác nhận đơn", () => Lam(Program.Lay<DatSanService>().XacNhan(_maDon, PhienDangNhap.MaNV)), chinh: true);
                 Them("Từ chối đơn", () =>
                 {
                     if (Ui.HoiXacNhan("Từ chối đơn này? Đơn sẽ chuyển sang trạng thái Đã hủy."))
@@ -101,6 +108,16 @@ public class FrmChiTietDon : Form
         var dong = Ui.Nut("Đóng", x, 0, 90);
         dong.Click += (_, _) => Close();
         _nut.Controls.Add(dong);
+    }
+
+    // Đơn đặt online: chỉ xác nhận khi tài khoản đã nhận đúng số tiền cọc với nội dung DSxxx
+    private void XacNhanDaNhanCoc()
+    {
+        var noiDung = VietQR.NoiDungChuyenKhoan(_maDon);
+        if (!Ui.HoiXacNhan($"Tài khoản ngân hàng đã nhận được {_don!.TienCoc.Vnd()} với nội dung \"{noiDung}\" chưa?\n\n" +
+                           "Bấm Yes để ghi nhận tiền cọc và xác nhận đơn. Khách sẽ thấy đơn chuyển sang Đã xác nhận."))
+            return;
+        Lam(Program.Lay<DatSanService>().XacNhan(_maDon, PhienDangNhap.MaNV));
     }
 
     private void HuyDon()

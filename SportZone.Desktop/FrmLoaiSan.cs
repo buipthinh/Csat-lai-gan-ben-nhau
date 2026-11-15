@@ -2,18 +2,28 @@ using SportZone.Data.Entities;
 
 namespace SportZone.Desktop;
 
-// UC23 Quản lý loại sân
+//UC23 Quản lý loại sân
 public class FrmLoaiSan : FrmCrudBase<LoaiSan>
 {
     private readonly TextBox _ten = new() { Left = 130, Top = 14, Width = 250, Font = Ui.FontThuong };
     private readonly TextBox _moTa = new() { Left = 130, Top = 48, Width = 450, Height = 60, Multiline = true, Font = Ui.FontThuong };
+    private readonly Label _luuY = new() {
+        Text = "* Lưu ý:\n"
+                + "- Thêm loại sân thì nhấn vào Thêm mới.\n"
+                + "- Nếu muốn thay đổi loại sân, nhấn vào một sân nào đó, sau khi thay đổi nhấn Lưu.",
+        Left = 600, Top = 14, Width = 800, Height = 80,
+        ForeColor = Color.Gray,
+        Font = new Font("Segoe UI", 13)
+    };
 
+    //Constructor
     public FrmLoaiSan() : base("Quản lý loại sân")
     {
         ONhap.Controls.AddRange(new Control[]
         {
             Ui.Nhan("Tên loại sân", 12, 14), _ten,
-            Ui.Nhan("Mô tả", 12, 48), _moTa
+            Ui.Nhan("Mô tả", 12, 48), _moTa,
+            _luuY
         });
         KhoiDong();
     }

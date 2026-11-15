@@ -2,7 +2,7 @@ using SportZone.Business.Services;
 
 namespace SportZone.Desktop;
 
-// Cửa sổ chính: menu lọc theo vai trò (BR10), vùng làm việc mặc định là lịch sân (UC14)
+// Cửa sổ chính: menu dọc bên trái lọc theo vai trò (BR10), vùng làm việc mặc định là lịch sân (UC14)
 public class FrmMain : Form
 {
     private readonly Panel _vungLamViec = new() { Dock = DockStyle.Fill, BackColor = Color.White };
@@ -11,6 +11,19 @@ public class FrmMain : Form
     private readonly ToolStripStatusLabel _lblChoXacNhan = new() { Spring = true, TextAlign = ContentAlignment.MiddleRight };
     private readonly System.Windows.Forms.Timer _timer = new() { Interval = 30_000 };
     private UcLichSan? _lichSan;
+    private readonly Panel _khung = new() { Dock = DockStyle.Fill };
+    private readonly Label _tieuDe = new()
+    {
+        Dock = DockStyle.Top, Height = 80,
+        Font = new Font("Segoe UI", 15, FontStyle.Bold),
+        ForeColor = Color.FromArgb(30, 41, 59),
+        BackColor = Color.White,
+        TextAlign = ContentAlignment.MiddleLeft,
+        Padding = new Padding(16, 0, 0, 0)
+    };
+
+    private static readonly Color MauNen = Color.FromArgb(226, 232, 240);
+    private static readonly Color MauHover = Color.FromArgb(226, 232, 240);
 
     public FrmMain()
     {
@@ -19,7 +32,10 @@ public class FrmMain : Form
         MinimumSize = new Size(1100, 700);
         Font = Ui.FontThuong;
 
-        Controls.Add(_vungLamViec);
+        // Thứ tự Add: Fill trước, rồi Left, rồi Bottom
+        _khung.Controls.Add(_vungLamViec);
+        _khung.Controls.Add(_tieuDe);
+        Controls.Add(_khung);
         Controls.Add(TaoMenu());
         _thanhTrangThai.Items.AddRange(new ToolStripItem[] { _lblNguoiDung, _lblChoXacNhan });
         Controls.Add(_thanhTrangThai);
@@ -34,7 +50,18 @@ public class FrmMain : Form
 
     private MenuStrip TaoMenu()
     {
-        var menu = new MenuStrip { Font = Ui.FontThuong };
+        var menu = new MenuStrip
+        {
+            Font = Ui.FontThuong,
+            Dock = DockStyle.Left,
+            LayoutStyle = ToolStripLayoutStyle.VerticalStackWithOverflow,
+            AutoSize = false,
+            Width = 190,
+            BackColor = MauNen,
+            ForeColor = Color.Black,
+            Padding = new Padding(0, 12, 0, 0),
+            Renderer = new ToolStripProfessionalRenderer(new MauMenu())
+        };
 
         var mDatSan = new ToolStripMenuItem("&Đặt sân");
         mDatSan.DropDownItems.Add("Lịch sân (F5)", null, (_, _) => MoLichSan());
@@ -63,12 +90,49 @@ public class FrmMain : Form
         // Danh mục, bảng giá, thống kê chỉ dành cho quản lý (UC23–UC29)
         if (PhienDangNhap.LaQuanLy) menu.Items.AddRange(new ToolStripItem[] { mDanhMuc, mThongKe });
         menu.Items.Add(mHeThong);
+
+        foreach (ToolStripItem it in menu.Items)
+        {
+            if (it is not ToolStripMenuItem mi) continue;
+            mi.AutoSize = false;
+            mi.Size = new Size(188, 44);
+            mi.TextAlign = ContentAlignment.MiddleLeft;
+            mi.Padding = new Padding(10, 0, 0, 0);
+            mi.ForeColor = Color.Black;
+            mi.DropDownDirection = ToolStripDropDownDirection.Right;
+            mi.MouseEnter += (_, _) => { if (mi.HasDropDownItems && !mi.DropDown.Visible) mi.ShowDropDown(); };
+            mi.MouseUp += (_, _) => { if (mi.HasDropDownItems) menu.BeginInvoke(() => mi.ShowDropDown()); };
+            foreach (ToolStripItem con in mi.DropDownItems)
+            {
+                con.ForeColor = Color.Black;
+                con.Padding = new Padding(4, 4, 4, 4);
+            }
+        }
+        menu.Paint += (_, e) => e.Graphics.DrawLine(Pens.Gainsboro, menu.Width - 1, 0, menu.Width - 1, menu.Height);
         MainMenuStrip = menu;
         return menu;
     }
 
+    //Tạo màu cho thanh menu
+    private class MauMenu : ProfessionalColorTable
+    {
+        public override Color MenuItemSelected => MauHover;
+        public override Color MenuItemSelectedGradientBegin => MauHover;
+        public override Color MenuItemSelectedGradientEnd => MauHover;
+        public override Color MenuItemPressedGradientBegin => MauHover;
+        public override Color MenuItemPressedGradientEnd => MauHover;
+        public override Color MenuItemBorder => MauHover;
+        public override Color MenuStripGradientBegin => MauNen;
+        public override Color MenuStripGradientEnd => MauNen;
+        public override Color ToolStripDropDownBackground => Color.White;
+        public override Color ImageMarginGradientBegin => Color.White;
+        public override Color ImageMarginGradientMiddle => Color.White;
+        public override Color ImageMarginGradientEnd => Color.White;
+    }
+
     private void MoLichSan()
     {
+        _tieuDe.Text = "Lịch sân";
         _vungLamViec.Controls.Clear();
         _lichSan = new UcLichSan { Dock = DockStyle.Fill };
         _lichSan.DonThayDoi += CapNhatSoDonCho;
@@ -77,6 +141,7 @@ public class FrmMain : Form
 
     private void Mo(Form f)
     {
+        _tieuDe.Text = f.Text;
         _vungLamViec.Controls.Clear();
         f.TopLevel = false;
         f.FormBorderStyle = FormBorderStyle.None;

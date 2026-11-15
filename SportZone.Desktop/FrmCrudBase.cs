@@ -18,14 +18,16 @@ public abstract class FrmCrudBase<T> : Form where T : class
         var nutThem = Ui.Nut("Thêm mới", 12, 8, 100);
         var nutLuu = Ui.Nut("Lưu", 118, 8, 100, chinh: true);
         var nutXoa = Ui.Nut("Xóa", 224, 8, 100);
-        nutThem.Click += (_, _) => { DangChon = null; Luoi.ClearSelection(); XoaONhap(); };
-        nutLuu.Click += (_, _) => { if (Luu()) TaiLai(); };
+        nutThem.Click += (_, _) => { Luoi.ClearSelection(); DangChon = null; XoaONhap(); };
+        nutLuu.Click += (_, _) => { if (Luu()) { TaiLai(); Luoi.ClearSelection(); DangChon = null; XoaONhap(); } };
         nutXoa.Click += (_, _) => { if (DangChon != null && Ui.HoiXacNhan("Xóa dòng đang chọn?") && Xoa()) { DangChon = null; XoaONhap(); TaiLai(); } };
         thanh.Controls.AddRange(new Control[] { nutThem, nutLuu, nutXoa });
 
         Luoi.SelectionChanged += (_, _) =>
         {
-            if (Luoi.CurrentRow?.Tag is T item) { DangChon = item; DoVaoONhap(item); }
+            if (Luoi.SelectedRows.Count > 0 && Luoi.SelectedRows[0].Tag is T item)
+            { DangChon = item; DoVaoONhap(item); }
+            else DangChon = null;
         };
 
         Controls.Add(Luoi);
@@ -38,6 +40,8 @@ public abstract class FrmCrudBase<T> : Form where T : class
     {
         TaoCot();
         TaiLai();
+        Luoi.ClearSelection();
+        DangChon = null;
         XoaONhap();
     }
 

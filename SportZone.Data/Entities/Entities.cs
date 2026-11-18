@@ -29,6 +29,8 @@ public class KhachHang
     // NULL với khách được nhân viên tạo nhanh tại quầy (chưa có tài khoản Web)
     public string? MatKhauHash { get; set; }
     public int DiemTichLuy { get; set; }
+    // Khóa thay cho xóa: khách bị khóa không đăng nhập và không đặt sân online được, lịch sử đơn vẫn giữ
+    public string TrangThai { get; set; } = TrangThaiTaiKhoan.HoatDong;
     public ICollection<DatSan> DatSans { get; set; } = new List<DatSan>();
 }
 

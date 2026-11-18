@@ -49,6 +49,8 @@ public class TaiKhoanService
         var kh = db.KhachHangs.AsNoTracking().FirstOrDefault(x => x.SDT == sdt || x.Email == k);
         if (kh == null || !KiemTraMatKhau(matKhau, kh.MatKhauHash))
             return KetQua<KhachHang>.Loi("Sai số điện thoại/email hoặc mật khẩu.");
+        if (kh.TrangThai == TrangThaiTaiKhoan.DaKhoa)
+            return KetQua<KhachHang>.Loi("Tài khoản đã bị khóa. Vui lòng liên hệ sân để được mở lại.");
         return KetQua<KhachHang>.Ok(kh);
     }
 

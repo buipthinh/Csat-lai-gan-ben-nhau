@@ -40,6 +40,7 @@ public class FrmKhachHang : FrmCrudBase<KhachHang>
         ThemCot("Email", 180);
         ThemCot("Tài khoản web", 100);
         ThemCot("Số đơn", 70);
+        ThemCot("Trạng thái", 90);
     }
 
     protected override void TaiLai()
@@ -49,8 +50,10 @@ public class FrmKhachHang : FrmCrudBase<KhachHang>
         foreach (var k in Program.Lay<KhachHangService>().TimKiem(_tuKhoa.Text))
         {
             var i = Luoi.Rows.Add(k.MaKH, k.HoTen, k.SDT, k.Email,
-                k.MatKhauHash == null ? "Chưa có" : "Đã có", dons.LichSuCuaKhach(k.MaKH).Count);
+                k.MatKhauHash == null ? "Chưa có" : "Đã có", dons.LichSuCuaKhach(k.MaKH).Count, k.TrangThai);
             Luoi.Rows[i].Tag = k;
+            if (k.TrangThai == TrangThaiTaiKhoan.DaKhoa)
+                Luoi.Rows[i].Cells[6].Style.BackColor = Color.FromArgb(248, 215, 218);
         }
     }
 
@@ -68,9 +71,15 @@ public class FrmKhachHang : FrmCrudBase<KhachHang>
         return kq.ThanhCong;
     }
 
+    // Nút thứ ba của form: khóa / mở lại tài khoản thay cho xóa
+    protected override string ChuNutXoa => "Khóa / Mở khóa";
+    protected override string CauHoiXoa => DangChon?.TrangThai == TrangThaiTaiKhoan.DaKhoa
+        ? $"Mở lại tài khoản của {DangChon.HoTen}?"
+        : $"Khóa tài khoản của {DangChon?.HoTen}? Khách sẽ không đăng nhập và không đặt sân online được.";
+
     protected override bool Xoa()
     {
-        var kq = Program.Lay<KhachHangService>().Xoa(DangChon!.MaKH);
+        var kq = Program.Lay<KhachHangService>().KhoaMoKhach(DangChon!.MaKH);
         kq.HienKetQua();
         return kq.ThanhCong;
     }

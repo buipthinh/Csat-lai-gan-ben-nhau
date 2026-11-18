@@ -128,7 +128,10 @@ public class DatSanService
             var san = db.Sans.FirstOrDefault(s => s.MaSan == maSan);
             if (san == null) return KetQua<DatSan>.Loi("Không tìm thấy sân.");
             if (san.TrangThai != TrangThaiSan.HoatDong) return KetQua<DatSan>.Loi("Sân đang bảo trì, tạm không nhận đặt."); // BR08
-            if (!db.KhachHangs.Any(k => k.MaKH == maKH)) return KetQua<DatSan>.Loi("Không tìm thấy khách hàng.");
+            var khach = db.KhachHangs.FirstOrDefault(k => k.MaKH == maKH);
+            if (khach == null) return KetQua<DatSan>.Loi("Không tìm thấy khách hàng.");
+            if (khach.TrangThai == TrangThaiTaiKhoan.DaKhoa)
+                return KetQua<DatSan>.Loi("Tài khoản khách hàng đang bị khóa, không đặt sân được.");
             if (CoTrungLich(db, maSan, ngay, batDau, ketThuc))
                 return KetQua<DatSan>.Loi("Khung giờ này đã có người đặt. Vui lòng chọn giờ khác.");
 

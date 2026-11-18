@@ -227,6 +227,13 @@ namespace SportZone.Data.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(15)");
 
+                    b.Property<string>("TrangThai")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Hoạt động");
+
                     b.HasKey("MaKH");
 
                     b.HasIndex("SDT")

@@ -55,6 +55,7 @@ public class SportZoneDbContext : DbContext
             e.HasIndex(x => x.SDT).IsUnique();
             e.Property(x => x.Email).HasMaxLength(100);
             e.Property(x => x.MatKhauHash).HasMaxLength(100).IsUnicode(false);
+            e.Property(x => x.TrangThai).HasMaxLength(20).IsRequired().HasDefaultValue(TrangThaiTaiKhoan.HoatDong);
         });
 
         mb.Entity<LoaiSan>(e =>

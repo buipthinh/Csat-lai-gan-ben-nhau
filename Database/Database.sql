@@ -1,13 +1,29 @@
 ﻿/* =====================================================================
-Tài khoản mẫu (mật khẩu đã băm BCrypt trong bảng):
-Desktop: admin / admin123 (Quản lý) - nhanvien / nv123456 (Nhân viên)
-Web: 0901234567 / 123456 - 0912345678 / 123456
-===================================================================== */
+   SPORTZONE - SCRIPT TẠO CƠ SỞ DỮ LIỆU (SQL Server 2019 trở lên / LocalDB)
+   ---------------------------------------------------------------------
+   Nội dung:
+     Phần 1. Tạo database SportZone
+     Phần 2. Tạo 12 bảng, khóa chính, khóa ngoại, UNIQUE, CHECK, index
+             (sinh từ migration EF Core "KhoiTao", khớp 100% với code C#)
+     Phần 3. Dữ liệu mẫu: 2 vai trò, 2 nhân viên, 4 khách hàng, 5 loại sân,
+             13 sân, 3 khung giờ, 30 mức giá, 6 dịch vụ, 766 đơn đặt sân,
+             647 hóa đơn. Ngày của đơn được tính tương đối so với ngày chạy
+             script (30 ngày trước đến 3 ngày sau) nên luôn có số liệu mới.
+     Phần 4. View phục vụ báo cáo và câu lệnh kiểm tra
+
+   Tài khoản mẫu (mật khẩu đã băm BCrypt trong bảng):
+     Desktop: admin / admin123 (Quản lý)    nhanvien / nv123456 (Nhân viên)
+     Web    : 0901234567 / 123456           0912345678 / 123456
+
+   Cách chạy: mở file trong SQL Server Management Studio (hoặc Azure Data
+   Studio), kết nối tới (localdb)\MSSQLLocalDB, bấm Execute (F5).
+   Nếu muốn tạo lại từ đầu, bỏ chú thích 3 dòng DROP ở Phần 1.
+   ===================================================================== */
 
 SET NOCOUNT ON;
 GO
 
-/*TẠO DATABASE*/
+/* ---------------- PHẦN 1. TẠO DATABASE ---------------- */
 USE master;
 GO
 -- IF DB_ID(N'SportZone') IS NOT NULL
@@ -16,8 +32,8 @@ GO
 GO
 IF DB_ID(N'SportZone') IS NOT NULL
 BEGIN
-    RAISERROR(N'Database SportZone đã tồn tại.', 16, 1);
-    SET NOEXEC ON;
+    RAISERROR(N'Database SportZone đã tồn tại. Bỏ chú thích các dòng DROP ở Phần 1 nếu muốn tạo lại.', 16, 1);
+    SET NOEXEC ON;   -- dừng toàn bộ script, không đụng vào dữ liệu đang có
 END
 GO
 CREATE DATABASE SportZone COLLATE Vietnamese_CI_AS;
@@ -25,7 +41,7 @@ GO
 USE SportZone;
 GO
 
-/*TẠO BẢNG*/
+/* ---------------- PHẦN 2. TẠO BẢNG ---------------- */
 IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
 BEGIN
     CREATE TABLE [__EFMigrationsHistory] (
@@ -52,6 +68,7 @@ CREATE TABLE [KhachHang] (
     [Email] nvarchar(100) NULL,
     [MatKhauHash] varchar(100) NULL,
     [DiemTichLuy] int NOT NULL,
+    [TrangThai] nvarchar(20) NOT NULL DEFAULT N'Hoạt động',
     CONSTRAINT [PK_KhachHang] PRIMARY KEY ([MaKH])
 );
 
@@ -199,12 +216,13 @@ CREATE UNIQUE INDEX [IX_NhanVien_TenDangNhap] ON [NhanVien] ([TenDangNhap]);
 CREATE INDEX [IX_San_MaLoai] ON [San] ([MaLoai]);
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261026150259_KhoiTao', N'10.0.14');
+VALUES (N'20261026150259_KhoiTao', N'10.0.14'),
+       (N'20261118164018_ThemTrangThaiKhachHang', N'10.0.14');
 
 COMMIT;
 GO
 
-/*DỮ LIỆU MẪU*/
+/* ---------------- PHẦN 3. DỮ LIỆU MẪU ---------------- */
 BEGIN TRANSACTION;
 DECLARE @HomNay date = CAST(GETDATE() AS date);
 
@@ -218,15 +236,15 @@ SET IDENTITY_INSERT [VaiTro] OFF;
 -- NhanVien: 2 dòng
 SET IDENTITY_INSERT [NhanVien] ON;
 INSERT INTO [NhanVien] ([MaNV], [HoTen], [TenDangNhap], [MatKhauHash], [MaVaiTro], [TrangThai]) VALUES
-    (1, N'Nguyễn Văn An', N'admin', N'$2a$11$aw27BwXA9iKbfOs6XPaP5erU0lpuJWZG24tk1eBpevmbNZNEGqf4y', 1, N'Hoạt động'),
-    (2, N'Trần Thị Bình', N'nhanvien', N'$2a$11$yKPWEIJHQHQ3gACVJhLhlesJNdIIVpvU95MA3NeJEtz/7YSs.25nC', 2, N'Hoạt động');
+    (1, N'Lê Thanh Huy', N'admin', N'$2a$11$aw27BwXA9iKbfOs6XPaP5erU0lpuJWZG24tk1eBpevmbNZNEGqf4y', 1, N'Hoạt động'),
+    (2, N'Bùi Phúc Thịnh', N'nhanvien', N'$2a$11$yKPWEIJHQHQ3gACVJhLhlesJNdIIVpvU95MA3NeJEtz/7YSs.25nC', 2, N'Hoạt động');
 SET IDENTITY_INSERT [NhanVien] OFF;
 
 -- KhachHang: 4 dòng
 SET IDENTITY_INSERT [KhachHang] ON;
 INSERT INTO [KhachHang] ([MaKH], [HoTen], [SDT], [Email], [MatKhauHash], [DiemTichLuy]) VALUES
-    (1, N'Lê Minh Khoa', N'0901234567', N'khoa@example.com', N'$2a$11$DiSOGyf.DdJhNbEsz/bVMuYaZVrhMADyJPG/L86BbB6QFyRqUCvSe', 0),
-    (2, N'Phạm Thu Hà', N'0912345678', N'ha@example.com', N'$2a$11$iPpAvsoFGe1Zc/4g1OXwmus/uhejEvf9zEVjjANCuRxN.tyQVjTEm', 0),
+    (1, N'Bùi Quang Tín', N'0901234567', N'tin@gmail.com', N'$2a$11$DiSOGyf.DdJhNbEsz/bVMuYaZVrhMADyJPG/L86BbB6QFyRqUCvSe', 0),
+    (2, N'Phạm Thu Hà', N'0912345678', NULL, N'$2a$11$iPpAvsoFGe1Zc/4g1OXwmus/uhejEvf9zEVjjANCuRxN.tyQVjTEm', 0),
     (3, N'Võ Quốc Huy', N'0923456789', NULL, NULL, 0),
     (4, N'Đặng Ngọc Lan', N'0934567890', NULL, NULL, 0);
 SET IDENTITY_INSERT [KhachHang] OFF;
@@ -2129,7 +2147,7 @@ SET IDENTITY_INSERT [HoaDon] OFF;
 COMMIT;
 GO
 
-/*VIEW BÁO CÁO */
+/* ---------------- PHẦN 4. VIEW BÁO CÁO ---------------- */
 
 -- Doanh thu theo ngày (UC29): doanh thu = tiền sân + dịch vụ, ghi trong HoaDon.TongTien
 CREATE VIEW vw_DoanhThuTheoNgay AS
@@ -2152,7 +2170,7 @@ JOIN KhachHang k ON k.MaKH = d.MaKH
 WHERE d.TrangThai <> N'Đã hủy';
 GO
 
-/*KIỂM TRA SAU KHI CHẠY*/
+/* ---------------- KIỂM TRA SAU KHI CHẠY ---------------- */
 SELECT 'VaiTro' AS Bang, COUNT(*) AS SoDong FROM VaiTro
 UNION ALL SELECT 'NhanVien', COUNT(*) FROM NhanVien
 UNION ALL SELECT 'KhachHang', COUNT(*) FROM KhachHang

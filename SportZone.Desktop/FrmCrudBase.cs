@@ -24,10 +24,10 @@ public abstract class FrmCrudBase<T> : Form where T : class
         var thanh = new Panel { Dock = DockStyle.Bottom, Height = 46, BackColor = Color.White };
         var nutThem = Ui.Nut("Thêm mới", 12, 8, 100);
         var nutLuu = Ui.Nut("Lưu", 118, 8, 100, chinh: true);
-        var nutXoa = Ui.Nut("Xóa", 224, 8, 100);
+        var nutXoa = Ui.Nut(ChuNutXoa, 224, 8, ChuNutXoa.Length > 6 ? 150 : 100);   // SỬA
         nutThem.Click += (_, _) => { DangChon = null; Luoi.ClearSelection(); XoaONhap(); CapNhatCheDo(); };
         nutLuu.Click += (_, _) => { if (Luu()) { TaiLai(); Luoi.ClearSelection(); DangChon = null; XoaONhap(); CapNhatCheDo(); } };
-        nutXoa.Click += (_, _) => { if (DangChon != null && Ui.HoiXacNhan("Xóa dòng đang chọn?") && Xoa()) { DangChon = null; XoaONhap(); CapNhatCheDo(); TaiLai(); } };
+        nutXoa.Click += (_, _) => { if (DangChon != null && Ui.HoiXacNhan(CauHoiXoa) && Xoa()) { DangChon = null; XoaONhap(); CapNhatCheDo(); TaiLai(); } };   // SỬA
         thanh.Controls.AddRange(new Control[] { nutThem, nutLuu, nutXoa });
 
         Luoi.SelectionChanged += (_, _) => {
@@ -62,6 +62,9 @@ public abstract class FrmCrudBase<T> : Form where T : class
     protected abstract void XoaONhap();
     protected abstract bool Luu();
     protected virtual bool Xoa() => false;
+    // Form con đổi chữ trên nút thứ ba và câu hỏi xác nhận (Khách hàng dùng "Khóa / Mở khóa")
+    protected virtual string ChuNutXoa => "Xóa";                       // MỚI
+    protected virtual string CauHoiXoa => "Xóa dòng đang chọn?";       // MỚI
 
     protected void CapNhatCheDo() {
         if (DangChon == null) {

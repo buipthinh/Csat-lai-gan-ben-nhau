@@ -36,6 +36,19 @@ public class KhachHangService
         return KetQua<KhachHang>.Ok(kh, "Đã lưu khách hàng.");
     }
 
+    // Khóa hoặc mở lại tài khoản khách (thay cho xóa, vì khách đã có đơn thì không xóa được)
+    public KetQua KhoaMoKhach(int maKH)
+    {
+        using var db = _dbf.CreateDbContext();
+        var kh = db.KhachHangs.FirstOrDefault(k => k.MaKH == maKH);
+        if (kh == null) return KetQua.Loi("Không tìm thấy khách hàng.");
+        kh.TrangThai = kh.TrangThai == TrangThaiTaiKhoan.DaKhoa ? TrangThaiTaiKhoan.HoatDong : TrangThaiTaiKhoan.DaKhoa;
+        db.SaveChanges();
+        return KetQua.Ok(kh.TrangThai == TrangThaiTaiKhoan.DaKhoa
+            ? $"Đã khóa tài khoản của {kh.HoTen}."
+            : $"Đã mở lại tài khoản của {kh.HoTen}.");
+    }
+
     public KetQua Xoa(int maKH)
     {
         using var db = _dbf.CreateDbContext();

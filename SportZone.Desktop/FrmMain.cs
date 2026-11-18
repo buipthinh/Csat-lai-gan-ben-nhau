@@ -22,8 +22,8 @@ public class FrmMain : Form
         Padding = new Padding(16, 0, 0, 0)
     };
 
-    private static readonly Color MauNen = Color.FromArgb(226, 232, 240);
-    private static readonly Color MauHover = Color.FromArgb(226, 232, 240);
+    private static readonly Color MauNen = Ui.XanhDam;
+    private static readonly Color MauHover = Ui.Xanh;
 
     public FrmMain()
     {
@@ -46,6 +46,7 @@ public class FrmMain : Form
         CapNhatSoDonCho();
 
         MoLichSan();
+        
     }
 
     private MenuStrip TaoMenu()
@@ -109,6 +110,14 @@ public class FrmMain : Form
             }
         }
         menu.Paint += (_, e) => e.Graphics.DrawLine(Pens.Gainsboro, menu.Width - 1, 0, menu.Width - 1, menu.Height);
+        menu.Renderer = new MenuRenderer();
+
+        //chữ trên thanh bar màu trắng, in đậm; menu con giữ chữ thường
+        foreach (ToolStripItem item in menu.Items) {
+            item.ForeColor = Color.White;
+            item.Font = new Font(Ui.FontThuong, FontStyle.Bold);
+            if (item is ToolStripMenuItem m) m.DropDown.Font = Ui.FontThuong;
+        }
         MainMenuStrip = menu;
         return menu;
     }
@@ -168,5 +177,24 @@ public class FrmMain : Form
     {
         if (keyData == Keys.F5) { MoLichSan(); return true; }
         return base.ProcessCmdKey(ref msg, keyData);
+    }
+
+    private class MenuRenderer : ToolStripProfessionalRenderer {
+        private static readonly Color XanhNhat = Color.FromArgb(76, 175, 120);
+        private static readonly Color XamHover = Color.FromArgb(229, 229, 229);
+
+        protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e) {
+            if (!e.Item.Selected && !e.Item.Pressed) {
+                base.OnRenderMenuItemBackground(e);
+                return;
+            }
+            using var co = new SolidBrush(e.Item.IsOnDropDown ? XamHover : XanhNhat);
+            e.Graphics.FillRectangle(co, new Rectangle(Point.Empty, e.Item.Size));
+        }
+
+        protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e) {
+            e.TextColor = e.Item.IsOnDropDown ? Color.Black : Color.White;
+            base.OnRenderItemText(e);
+        }
     }
 }

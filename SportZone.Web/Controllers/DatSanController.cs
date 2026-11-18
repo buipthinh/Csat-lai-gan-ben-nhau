@@ -32,7 +32,10 @@ public class DatSanController : Controller
         var san = _danhMuc.LaySan(maSan);
         if (san == null) return NotFound();
         var vm = new XacNhanDatVM { San = san, Ngay = ngay, GioBatDau = gioBatDau, GioKetThuc = gioKetThuc };
-        vm.Loi = QuyTac.KiemTraKhungGio(ngay, gioBatDau, gioKetThuc, DateTime.Now);
+        //BR08: sân bảo trì thì báo ngay, không hiện báo giá
+        vm.Loi = san.TrangThai != TrangThaiSan.HoatDong
+            ? "Sân đang bảo trì, tạm không nhận đặt."
+            : QuyTac.KiemTraKhungGio(ngay, gioBatDau, gioKetThuc, DateTime.Now);
         if (vm.Loi == null && _datSan.CoTrungLich(maSan, ngay, gioBatDau, gioKetThuc))
             vm.Loi = "Khung giờ này đã có người đặt. Vui lòng chọn giờ khác.";
         if (vm.Loi == null)

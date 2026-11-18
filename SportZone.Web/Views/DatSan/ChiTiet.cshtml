@@ -97,6 +97,11 @@
                 <button class="btn btn-outline-danger w-100" type="submit">Hủy đơn này</button>
             </form>
             <p class="small text-muted mt-2">Chỉ hủy được khi còn hơn 3 giờ trước giờ chơi.</p>
+                }
+        else if (Model.TrangThai == TrangThaiDon.ChoXacNhan || Model.TrangThai == TrangThaiDon.DaXacNhan) {
+            <div class="alert alert-warning mt-3 small">
+                Đơn còn dưới 3 giờ trước giờ chơi nên không thể tự hủy trên web. Vui lòng gọi điện cho sân để được hỗ trợ.
+            </div>
         }
         <a class="btn btn-link w-100 mt-2" asp-action="LichSu">← Về lịch sử đặt sân</a>
     </div>

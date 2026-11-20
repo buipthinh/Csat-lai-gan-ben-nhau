@@ -16,15 +16,10 @@ public class DatSanService
         _bayGio = dongHo ?? (() => DateTime.Now);
     }
 
-    // ---------- Kiểm tra trùng lịch (UC32, BR05) ----------
+    // Kiểm tra trùng lịch (UC32, BR05)
 
     internal static bool CoTrungLich(SportZoneDbContext db, int maSan, DateOnly ngay, TimeOnly batDau, TimeOnly ketThuc, int? boQuaMaDon = null) =>
-        db.DatSans.Any(d => d.MaSan == maSan
-                            && d.NgaySuDung == ngay
-                            && d.TrangThai != TrangThaiDon.DaHuy
-                            && d.MaDatSan != (boQuaMaDon ?? 0)
-                            && batDau < d.GioKetThuc
-                            && ketThuc > d.GioBatDau);
+        db.DatSans.Any(d => d.MaSan == maSan && d.NgaySuDung == ngay && d.TrangThai != TrangThaiDon.DaHuy && d.MaDatSan != (boQuaMaDon ?? 0) && batDau < d.GioKetThuc && ketThuc > d.GioBatDau);
 
     public bool CoTrungLich(int maSan, DateOnly ngay, TimeOnly batDau, TimeOnly ketThuc)
     {
@@ -32,7 +27,7 @@ public class DatSanService
         return CoTrungLich(db, maSan, ngay, batDau, ketThuc);
     }
 
-    // ---------- Tra cứu ----------
+    // Tra cứu
 
     // Các đơn chưa hủy của một ngày, dùng cho lưới lịch sân (Desktop) và lưới giờ trống (Web)
     public List<DatSan> DonTrongNgay(DateOnly ngay, int? maSan = null)
@@ -49,11 +44,8 @@ public class DatSanService
     public List<San> TimSanTrong(int? maLoai, DateOnly ngay, TimeOnly batDau, TimeOnly ketThuc)
     {
         using var db = _dbf.CreateDbContext();
-        return db.Sans.AsNoTracking().Include(s => s.LoaiSan)
-            .Where(s => s.TrangThai == TrangThaiSan.HoatDong && (maLoai == null || s.MaLoai == maLoai))
-            .Where(s => !db.DatSans.Any(d => d.MaSan == s.MaSan && d.NgaySuDung == ngay
-                                             && d.TrangThai != TrangThaiDon.DaHuy
-                                             && batDau < d.GioKetThuc && ketThuc > d.GioBatDau))
+        return db.Sans.AsNoTracking().Include(s => s.LoaiSan) .Where(s => s.TrangThai == TrangThaiSan.HoatDong && !s.DaAn && !s.LoaiSan!.DaAn && (maLoai == null || s.MaLoai == maLoai))
+            .Where(s => !db.DatSans.Any(d => d.MaSan == s.MaSan && d.NgaySuDung == ngay && d.TrangThai != TrangThaiDon.DaHuy && batDau < d.GioKetThuc && ketThuc > d.GioBatDau))
             .OrderBy(s => s.MaLoai).ThenBy(s => s.TenSan)
             .ToList();
     }
@@ -103,7 +95,7 @@ public class DatSanService
         return db.DatSans.Count(d => d.TrangThai == TrangThaiDon.ChoXacNhan);
     }
 
-    // ---------- Đặt sân (UC08 trên Web, UC15 tại quầy) ----------
+    // Đặt sân (UC08 trên Web, UC15 tại quầy)
 
     public KetQua<DatSan> DatSanOnline(int maKH, int maSan, DateOnly ngay, TimeOnly batDau, TimeOnly ketThuc) =>
         TaoDon(maKH, maSan, ngay, batDau, ketThuc, TrangThaiDon.ChoXacNhan, maNV: null, thuCoc: true);
@@ -112,8 +104,7 @@ public class DatSanService
     public KetQua<DatSan> DatTaiQuay(int maKH, int maSan, DateOnly ngay, TimeOnly batDau, TimeOnly ketThuc, int maNV) =>
         TaoDon(maKH, maSan, ngay, batDau, ketThuc, TrangThaiDon.DaXacNhan, maNV, thuCoc: false);
 
-    private KetQua<DatSan> TaoDon(int maKH, int maSan, DateOnly ngay, TimeOnly batDau, TimeOnly ketThuc,
-                                  string trangThai, int? maNV, bool thuCoc)
+    private KetQua<DatSan> TaoDon(int maKH, int maSan, DateOnly ngay, TimeOnly batDau, TimeOnly ketThuc, string trangThai, int? maNV, bool thuCoc)
     {
         var loi = QuyTac.KiemTraKhungGio(ngay, batDau, ketThuc, _bayGio());
         if (loi != null) return KetQua<DatSan>.Loi(loi);
@@ -125,8 +116,8 @@ public class DatSanService
             // Nếu hai người đặt cùng lúc, chỉ một transaction commit được; người còn lại nhận thông báo trùng.
             using var tx = db.Database.BeginTransaction(IsolationLevel.Serializable);
 
-            var san = db.Sans.FirstOrDefault(s => s.MaSan == maSan);
-            if (san == null) return KetQua<DatSan>.Loi("Không tìm thấy sân.");
+            var san = db.Sans.Include(s => s.LoaiSan).FirstOrDefault(s => s.MaSan == maSan);
+            if (san == null || san.DaAn || san.LoaiSan!.DaAn) return KetQua<DatSan>.Loi("Không tìm thấy sân.");
             if (san.TrangThai != TrangThaiSan.HoatDong) return KetQua<DatSan>.Loi("Sân đang bảo trì, tạm không nhận đặt."); // BR08
             var khach = db.KhachHangs.FirstOrDefault(k => k.MaKH == maKH);
             if (khach == null) return KetQua<DatSan>.Loi("Không tìm thấy khách hàng.");

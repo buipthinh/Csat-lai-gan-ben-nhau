@@ -30,6 +30,7 @@ public class ThanhToanService
             var ct = don.ChiTietDichVus.FirstOrDefault(c => c.MaDV == maDV);
             if (sl == 0) { if (ct != null) db.ChiTietDichVus.Remove(ct); continue; }
             if (!dichVus.TryGetValue(maDV, out var dv)) return KetQua.Loi("Không tìm thấy dịch vụ.");
+            if (ct == null && dv.DaAn) return KetQua.Loi($"Dịch vụ {dv.TenDV} đang ẩn, không thêm vào đơn được.");
             if (ct == null) don.ChiTietDichVus.Add(new ChiTietDichVu { MaDV = maDV, SoLuong = sl, DonGia = dv.DonGia });
             else ct.SoLuong = sl; // giữ đơn giá lúc bán lần đầu
         }

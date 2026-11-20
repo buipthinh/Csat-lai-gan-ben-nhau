@@ -39,6 +39,7 @@ public class LoaiSan
     public int MaLoai { get; set; }
     public string TenLoai { get; set; } = "";
     public string? MoTa { get; set; }
+    public bool DaAn { get; set; } 
     public ICollection<San> Sans { get; set; } = new List<San>();
     public ICollection<BangGia> BangGias { get; set; } = new List<BangGia>();
 }
@@ -51,6 +52,7 @@ public class San
     public string? HinhAnh { get; set; }
     public string? MoTa { get; set; }
     public string TrangThai { get; set; } = TrangThaiSan.HoatDong;
+    public bool DaAn { get; set; } 
     public LoaiSan? LoaiSan { get; set; }
 }
 
@@ -60,6 +62,7 @@ public class KhungGio
     public string TenKhungGio { get; set; } = "";
     public TimeOnly GioBatDau { get; set; }
     public TimeOnly GioKetThuc { get; set; }
+    public bool DaAn { get; set; } 
 }
 
 public class BangGia
@@ -70,6 +73,7 @@ public class BangGia
     public decimal GiaMoiGio { get; set; }
     public LoaiSan? LoaiSan { get; set; }
     public KhungGio? KhungGio { get; set; }
+    public bool DaAn { get; set; } 
 }
 
 public class DatSan
@@ -86,6 +90,7 @@ public class DatSan
     public DateTime NgayTao { get; set; }
     public int? MaNVXacNhan { get; set; }
     public int? MaLichDinhKy { get; set; }
+    public bool DaAn { get; set; } 
 
     public KhachHang? KhachHang { get; set; }
     public San? San { get; set; }
@@ -119,6 +124,7 @@ public class DichVu
     public string TenDV { get; set; } = "";
     public string DonVi { get; set; } = "";
     public decimal DonGia { get; set; }
+    public bool DaAn { get; set; } 
 }
 
 public class ChiTietDichVu

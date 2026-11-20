@@ -18,21 +18,12 @@ public class FrmSan : FrmCrudBase<San>
         _loai.Format += (_, e) => { if (e.ListItem is LoaiSan l) e.Value = l.TenLoai; };
         _trangThai.Items.AddRange(new object[] { TrangThaiSan.HoatDong, TrangThaiSan.BaoTri });
 
-        var nutDoi = Ui.Nut("Đổi trạng thái bảo trì", 130, 116, 200);
-        nutDoi.Click += (_, _) =>
-        {
-            if (DangChon == null) { Ui.CanhBao("Chọn một sân trước."); return; }
-            var kq = Program.Lay<DanhMucService>().DoiTrangThaiSan(DangChon.MaSan);
-            kq.HienKetQua();
-            TaiLai();
-        };
-
         ONhap.Controls.AddRange(new Control[]
         {
             Ui.Nhan("Tên sân", 12, 14), _ten,
             Ui.Nhan("Loại sân", 12, 48), _loai,
             Ui.Nhan("Trạng thái", 12, 82), _trangThai,
-            Ui.Nhan("Mô tả", 350, 14, 90), _moTa, nutDoi
+            Ui.Nhan("Mô tả", 350, 14, 90), _moTa,
         });
         KhoiDong();
     }

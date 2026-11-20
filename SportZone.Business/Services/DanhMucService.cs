@@ -10,11 +10,11 @@ public class DanhMucService
     private readonly IDbContextFactory<SportZoneDbContext> _dbf;
     public DanhMucService(IDbContextFactory<SportZoneDbContext> dbf) => _dbf = dbf;
 
-    // ---------- Loại sân ----------
-    public List<LoaiSan> DanhSachLoaiSan()
+    // Loại sân
+    public List<LoaiSan> DanhSachLoaiSan(bool caAn = false)
     {
         using var db = _dbf.CreateDbContext();
-        return db.LoaiSans.AsNoTracking().OrderBy(l => l.MaLoai).ToList();
+        return db.LoaiSans.AsNoTracking().Where(l => caAn || !l.DaAn).OrderBy(l => l.MaLoai).ToList();
     }
 
     public KetQua LuuLoaiSan(int? ma, string ten, string? moTa)
@@ -27,23 +27,25 @@ public class DanhMucService
         return KetQua.Ok("Đã lưu loại sân.");
     }
 
-    public KetQua XoaLoaiSan(int ma)
+    public KetQua AnHienLoaiSan(int ma)
     {
         using var db = _dbf.CreateDbContext();
-        if (db.Sans.Any(s => s.MaLoai == ma)) return KetQua.Loi("Loại sân đang có sân nên không xóa được.");
-        db.BangGias.RemoveRange(db.BangGias.Where(g => g.MaLoai == ma));
         var l = db.LoaiSans.FirstOrDefault(x => x.MaLoai == ma);
-        if (l != null) db.LoaiSans.Remove(l);
+        if (l == null) return KetQua.Loi("Không tìm thấy loại sân.");
+        if (!l.DaAn && CoDonSapToi(db, d => d.San!.MaLoai == ma))
+            return KetQua.Loi("Loại sân này còn đơn đặt chưa diễn ra. Xử lý xong các đơn đó rồi mới ẩn được.");
+        l.DaAn = !l.DaAn;
         db.SaveChanges();
-        return KetQua.Ok("Đã xóa loại sân.");
+        return KetQua.Ok(l.DaAn ? $"Đã ẩn loại sân {l.TenLoai}." : $"Đã hiện lại loại sân {l.TenLoai}.");
     }
 
-    // ---------- Sân ----------
-    public List<San> DanhSachSan(int? maLoai = null, bool chiHoatDong = false)
+    // Sân
+    public List<San> DanhSachSan(int? maLoai = null, bool chiHoatDong = false, bool caAn = false)
     {
         using var db = _dbf.CreateDbContext();
         return db.Sans.AsNoTracking().Include(s => s.LoaiSan)
             .Where(s => (maLoai == null || s.MaLoai == maLoai) && (!chiHoatDong || s.TrangThai == TrangThaiSan.HoatDong))
+            .Where(s => caAn || (!s.DaAn && !s.LoaiSan!.DaAn))
             .OrderBy(s => s.MaLoai).ThenBy(s => s.TenSan).ToList();
     }
 
@@ -73,20 +75,32 @@ public class DanhMucService
         return KetQua.Ok($"{s.TenSan}: {s.TrangThai}.");
     }
 
-    public KetQua XoaSan(int maSan)
+    // Ẩn/hiện sân. Sân ẩn không hiện trên Web, lịch sân và form đặt tại quầy; đơn cũ vẫn giữ.
+    public KetQua AnHienSan(int maSan)
     {
         using var db = _dbf.CreateDbContext();
-        if (db.DatSans.Any(d => d.MaSan == maSan)) return KetQua.Loi("Sân đã có đơn đặt, hãy chuyển sang Bảo trì thay vì xóa.");
         var s = db.Sans.FirstOrDefault(x => x.MaSan == maSan);
-        if (s != null) { db.Sans.Remove(s); db.SaveChanges(); }
-        return KetQua.Ok("Đã xóa sân.");
+        if (s == null) return KetQua.Loi("Không tìm thấy sân.");
+        if (!s.DaAn && CoDonSapToi(db, d => d.MaSan == maSan))
+            return KetQua.Loi("Sân này còn đơn đặt chưa diễn ra. Xử lý xong các đơn đó (hoặc chuyển Bảo trì) rồi mới ẩn được.");
+        s.DaAn = !s.DaAn;
+        db.SaveChanges();
+        return KetQua.Ok(s.DaAn ? $"Đã ẩn {s.TenSan}." : $"Đã hiện lại {s.TenSan}.");
     }
 
-    // ---------- Khung giờ ----------
-    public List<KhungGio> DanhSachKhungGio()
+    // Còn đơn chưa hủy, chưa hoàn thành từ hôm nay trở đi thì không cho ẩn, tránh đơn biến mất khỏi lịch sân
+    private static bool CoDonSapToi(SportZoneDbContext db, System.Linq.Expressions.Expression<Func<DatSan, bool>> dieuKien)
+    {
+        var homNay = DateOnly.FromDateTime(DateTime.Now);
+        return db.DatSans.Where(dieuKien).Any(d => d.NgaySuDung >= homNay
+            && (d.TrangThai == TrangThaiDon.ChoXacNhan || d.TrangThai == TrangThaiDon.DaXacNhan || d.TrangThai == TrangThaiDon.DangChoi));
+    }
+
+    // Khung giờ
+    public List<KhungGio> DanhSachKhungGio(bool caAn = false)
     {
         using var db = _dbf.CreateDbContext();
-        return db.KhungGios.AsNoTracking().OrderBy(k => k.GioBatDau).ToList();
+        return db.KhungGios.AsNoTracking().Where(k => caAn || !k.DaAn).OrderBy(k => k.GioBatDau).ToList();
     }
 
     public KetQua LuuKhungGio(int? ma, string ten, TimeOnly batDau, TimeOnly ketThuc)
@@ -95,7 +109,7 @@ public class DanhMucService
         if (ketThuc <= batDau) return KetQua.Loi("Giờ kết thúc phải sau giờ bắt đầu.");
         if (batDau.Minute % 30 != 0 || ketThuc.Minute % 30 != 0) return KetQua.Loi("Khung giờ phải theo block 30 phút.");
         using var db = _dbf.CreateDbContext();
-        if (db.KhungGios.Any(k => k.MaKhungGio != (ma ?? 0) && batDau < k.GioKetThuc && ketThuc > k.GioBatDau))
+                if (db.KhungGios.Any(k => k.MaKhungGio != (ma ?? 0) && !k.DaAn && batDau < k.GioKetThuc && ketThuc > k.GioBatDau))
             return KetQua.Loi("Khung giờ bị chồng lên một khung giờ khác.");
         var k = ma == null ? db.KhungGios.Add(new KhungGio()).Entity : db.KhungGios.First(x => x.MaKhungGio == ma);
         k.TenKhungGio = ten.Trim(); k.GioBatDau = batDau; k.GioKetThuc = ketThuc;
@@ -103,22 +117,24 @@ public class DanhMucService
         return KetQua.Ok("Đã lưu khung giờ.");
     }
 
-    public KetQua XoaKhungGio(int ma)
+    // Ẩn/hiện khun giờ. Khung ẩn không dùng để tính giá nên giờ đó không đặt được; bảng giá vẫn giữ.
+    public KetQua AnHienKhungGio(int ma)
     {
         using var db = _dbf.CreateDbContext();
-        db.BangGias.RemoveRange(db.BangGias.Where(g => g.MaKhungGio == ma));
         var k = db.KhungGios.FirstOrDefault(x => x.MaKhungGio == ma);
-        if (k != null) db.KhungGios.Remove(k);
+        if (k == null) return KetQua.Loi("Không tìm thấy khung giờ.");
+        if (k.DaAn && db.KhungGios.Any(x => x.MaKhungGio != ma && !x.DaAn && k.GioBatDau < x.GioKetThuc && k.GioKetThuc > x.GioBatDau))
+            return KetQua.Loi("Không hiện lại được vì khung giờ này chồng lên một khung giờ đang dùng.");
+        k.DaAn = !k.DaAn;
         db.SaveChanges();
-        return KetQua.Ok("Đã xóa khung giờ và giá đi kèm.");
+        return KetQua.Ok(k.DaAn ? $"Đã ẩn khung giờ {k.TenKhungGio}." : $"Đã hiện lại khung giờ {k.TenKhungGio}.");
     }
 
-    // ---------- Bảng giá ----------
+    // Bảng giá
     public List<BangGia> BangGiaCuaLoai(int maLoai)
     {
         using var db = _dbf.CreateDbContext();
-        return db.BangGias.AsNoTracking().Include(g => g.KhungGio)
-            .Where(g => g.MaLoai == maLoai).OrderBy(g => g.LaCuoiTuan).ToList();
+                return db.BangGias.AsNoTracking().Where(g => !g.KhungGio!.DaAn).ToList();
     }
 
     public List<BangGia> TatCaBangGia()
@@ -138,11 +154,11 @@ public class DanhMucService
         return KetQua.Ok("Đã lưu giá.");
     }
 
-    // ---------- Dịch vụ ----------
-    public List<DichVu> DanhSachDichVu()
+    // Dịch vụ
+    public List<DichVu> DanhSachDichVu(bool caAn = false)
     {
         using var db = _dbf.CreateDbContext();
-        return db.DichVus.AsNoTracking().OrderBy(d => d.TenDV).ToList();
+        return db.DichVus.AsNoTracking().Where(d => caAn || !d.DaAn).OrderBy(d => d.TenDV).ToList();
     }
 
     public KetQua LuuDichVu(int? ma, string ten, string donVi, decimal donGia)
@@ -156,12 +172,14 @@ public class DanhMucService
         return KetQua.Ok("Đã lưu dịch vụ.");
     }
 
-    public KetQua XoaDichVu(int ma)
+    // Ẩn/hiện dịch vụ. Dịch vụ ẩn không thêm mới vào đơn được; đơn đã có dịch vụ đó vẫn giữ nguyên.
+    public KetQua AnHienDichVu(int ma)
     {
         using var db = _dbf.CreateDbContext();
-        if (db.ChiTietDichVus.Any(c => c.MaDV == ma)) return KetQua.Loi("Dịch vụ đã được bán trong đơn nên không xóa được.");
         var d = db.DichVus.FirstOrDefault(x => x.MaDV == ma);
-        if (d != null) { db.DichVus.Remove(d); db.SaveChanges(); }
-        return KetQua.Ok("Đã xóa dịch vụ.");
+        if (d == null) return KetQua.Loi("Không tìm thấy dịch vụ.");
+        d.DaAn = !d.DaAn;
+        db.SaveChanges();
+        return KetQua.Ok(d.DaAn ? $"Đã ẩn dịch vụ {d.TenDV}." : $"Đã hiện lại dịch vụ {d.TenDV}.");
     }
 }

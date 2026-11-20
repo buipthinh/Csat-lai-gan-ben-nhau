@@ -25,12 +25,12 @@ public class DatSanController : Controller
         _taiKhoanCoc = taiKhoanCoc;
     }
 
-    // UC08 bước 1: xem lại giờ đã chọn và tiền (UC33) trước khi xác nhận
+    // UC08 bước 1: xem lại giờ đã chọn và tiền (UC31) trước khi xác nhận
     [HttpGet]
     public IActionResult XacNhan(int maSan, DateOnly ngay, TimeOnly gioBatDau, TimeOnly gioKetThuc)
     {
         var san = _danhMuc.LaySan(maSan);
-        if (san == null) return NotFound();
+        if (san == null || san.DaAn || san.LoaiSan?.DaAn == true) return NotFound();
         var vm = new XacNhanDatVM { San = san, Ngay = ngay, GioBatDau = gioBatDau, GioKetThuc = gioKetThuc };
         //BR08: sân bảo trì thì báo ngay, không hiện báo giá
         vm.Loi = san.TrangThai != TrangThaiSan.HoatDong

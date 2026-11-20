@@ -36,7 +36,7 @@ public class SanController : Controller
     public IActionResult ChiTiet(int id, DateOnly? ngay)
     {
         var san = _danhMuc.LaySan(id);
-        if (san == null) return NotFound();
+        if (san == null || san.DaAn || san.LoaiSan?.DaAn == true) return NotFound();
         var homNay = DateOnly.FromDateTime(DateTime.Now);
         var n = ngay is { } x && x >= homNay ? x : homNay;
         var dons = _datSan.DonTrongNgay(n, id);

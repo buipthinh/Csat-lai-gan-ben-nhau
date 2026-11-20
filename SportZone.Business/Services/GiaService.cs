@@ -26,7 +26,7 @@ public class GiaService
         if (san == null) return KetQua<BaoGia>.Loi("Không tìm thấy sân.");
 
         var cuoiTuan = QuyTac.LaCuoiTuan(ngay);
-        var khungGios = db.KhungGios.AsNoTracking().ToList();
+        var khungGios = db.KhungGios.AsNoTracking().Where(k => !k.DaAn).ToList();
         var bangGia = db.BangGias.AsNoTracking()
             .Where(g => g.MaLoai == san.MaLoai && g.LaCuoiTuan == cuoiTuan)
             .ToList();

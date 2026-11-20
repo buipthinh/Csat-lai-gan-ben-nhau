@@ -63,8 +63,21 @@ public abstract class FrmCrudBase<T> : Form where T : class
     protected abstract bool Luu();
     protected virtual bool Xoa() => false;
     // Form con đổi chữ trên nút thứ ba và câu hỏi xác nhận (Khách hàng dùng "Khóa / Mở khóa")
-    protected virtual string ChuNutXoa => "Xóa";                       // MỚI
-    protected virtual string CauHoiXoa => "Xóa dòng đang chọn?";       // MỚI
+    protected virtual string ChuNutXoa => "Xóa";
+    protected virtual string CauHoiXoa => "Xóa dòng đang chọn?";
+    
+    // Dùng chung cho các form có Ẩn/Hiện: chữ ở cột "Hiển thị" và tô xám dòng đã ẩn
+    protected static string ChuHienThi(bool daAn) => daAn ? "Đã ẩn" : "Đang hiện";
+    protected void ToMauDongAn(int dong, bool daAn)
+    {
+        if (!daAn) return;
+        var r = Luoi.Rows[dong];
+        r.DefaultCellStyle.ForeColor = Color.Gray;
+        r.Cells[r.Cells.Count - 1].Style.BackColor = Color.FromArgb(233, 236, 239);
+    }
+    protected static string HoiAnHien(bool daAn, string ten, string hauQua) => daAn
+        ? $"Hiện lại {ten}?"
+        : $"Ẩn {ten}? {hauQua}\nBản ghi vẫn còn trong CSDL và hiện lại được bất cứ lúc nào.";
 
     protected void CapNhatCheDo() {
         if (DangChon == null) {

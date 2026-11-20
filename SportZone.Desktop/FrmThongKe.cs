@@ -2,7 +2,7 @@ using SportZone.Business.Services;
 
 namespace SportZone.Desktop;
 
-// UC29 thống kê doanh thu theo ngày. Biểu đồ cột vẽ bằng GDI+.
+// UC29 thống kê doanh thu theo ngày. Biểu đồ cột vẽ bằng GDI+
 public class FrmThongKe : Form
 {
     private readonly DateTimePicker _tuNgay = Ui.ChonNgay(70, 12);
@@ -51,8 +51,7 @@ public class FrmThongKe : Form
     }
 
     // Biểu đồ cột đơn giản: không dùng thư viện ngoài, vẽ trực tiếp bằng Graphics
-    private static void VeBieuDoCot(Graphics g, Size kichThuoc, List<(string Nhan, double GiaTri)> duLieu,
-                                    Color mau, Func<double, string> dinhDang)
+    private static void VeBieuDoCot(Graphics g, Size kichThuoc, List<(string Nhan, double GiaTri)> duLieu, Color mau, Func<double, string> dinhDang)
     {
         g.Clear(Color.White);
         if (duLieu.Count == 0) return;

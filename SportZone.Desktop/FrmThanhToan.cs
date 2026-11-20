@@ -24,11 +24,11 @@ public class FrmThanhToan : Form
         var t = Program.Lay<ThanhToanService>().TinhTamTinh(maDon);
         if (t == null) { Ui.CanhBao("Không tìm thấy đơn."); return; }
         _lblTien.Text =
-            $"Tiền sân:            {t.TienSan.Vnd()}\n" +
-            $"Tiền dịch vụ:        {t.TienDichVu.Vnd()}\n" +
-            $"Tổng giá trị:        {t.TongGiaTri.Vnd()}\n" +
-            $"Đã cọc:              {t.TienCoc.Vnd()}\n\n" +
-            $"KHÁCH PHẢI TRẢ:      {t.PhaiTra.Vnd()}";
+            $"Tiền sân: {t.TienSan.Vnd()}\n" +
+            $"Tiền dịch vụ: {t.TienDichVu.Vnd()}\n" +
+            $"Tổng giá trị: {t.TongGiaTri.Vnd()}\n" +
+            $"Đã cọc: {t.TienCoc.Vnd()}\n\n" +
+            $"KHÁCH PHẢI TRẢ: {t.PhaiTra.Vnd()}";
 
         var nutTT = Ui.Nut("Thanh toán & in", 270, 240, 150, chinh: true);
         nutTT.Click += (_, _) => ThanhToan();

@@ -13,7 +13,7 @@ public class ThongKeService
     public ThongKeService(IDbContextFactory<SportZoneDbContext> dbf) => _dbf = dbf;
 
     private List<HoaDon> HoaDonTrong(SportZoneDbContext db, DateTime tu, DateTime den) =>
-        // Tính tiền phía ứng dụng để chạy được cả trên SQL Server lẫn SQLite
+        // Tính tiền phía ứng dụng
         db.HoaDons.AsNoTracking().Where(h => h.NgayLap >= tu && h.NgayLap < den).ToList();
 
     public List<DoanhThuMoc> DoanhThuTheoNgay(DateOnly tuNgay, DateOnly denNgay)

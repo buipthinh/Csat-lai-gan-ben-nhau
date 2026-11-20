@@ -42,13 +42,21 @@ public class FrmSuaGia : Form {
         });
     }
 
-    //ô nhập giá: chỉ nhận số, bước 10.000, có dấu ngăn cách hàng nghìn
+    //ô nhập giá
     private static NumericUpDown OGia(int x, int y) => new() {
-        Left = x, Top = y, Width = 150, Maximum = 100_000_000, Increment = 10_000,
+        Left = x, Top = y, Width = 150, Minimum = -100_000_000, Maximum = 100_000_000, Increment = 10_000,
         ThousandsSeparator = true, TextAlign = HorizontalAlignment.Right, Font = Ui.FontThuong
     };
 
     private void Luu() {
+        foreach (var o in new[] { _thuong, _cuoiTuan }) {
+            if (o.Value < 0) {
+                MessageBox.Show("Giá không được âm.", "SportZone", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                o.Focus();
+                o.Select(0, o.Text.Length); //bôi đen ô sai để gõ lại luôn
+                return; //không lưu, cửa sổ vẫn mở
+            }
+        }
         var dm = Program.Lay<DanhMucService>();
         var kq = dm.LuuGia(_loai.MaLoai, _khung.MaKhungGio, false, _thuong.Value);
         if (kq.ThanhCong) kq = dm.LuuGia(_loai.MaLoai, _khung.MaKhungGio, true, _cuoiTuan.Value);

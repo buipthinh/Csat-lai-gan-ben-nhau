@@ -1,7 +1,4 @@
 namespace SportZone.Data.Entities;
-
-// Mỗi class tương ứng một bảng trong lược đồ quan hệ của PRD (12 bảng).
-
 public class VaiTro
 {
     public int MaVaiTro { get; set; }
@@ -101,7 +98,7 @@ public class DatSan
     public double SoGio => (GioKetThuc - GioBatDau).TotalHours;
 }
 
-// Bảng có trong lược đồ gốc; chức năng đặt định kỳ chưa nằm trong phạm vi lần này.
+// Bảng có trong lược đồ gốc; chức năng đặt định kỳ chưa nằm trong phạm vi lần này
 public class LichDinhKy
 {
     public int MaLich { get; set; }
@@ -142,7 +139,7 @@ public class HoaDon
     public int MaDatSan { get; set; }
     public int MaNV { get; set; }
     public DateTime NgayLap { get; set; }
-    // Tổng giá trị = tiền sân + tiền dịch vụ (doanh thu). Số khách trả thêm tại quầy = TongTien - TienCoc.
+    // Tổng giá trị = tiền sân + tiền dịch vụ (doanh thu). Số khách trả thêm tại quầy = TongTien - TienCoc
     public decimal TongTien { get; set; }
     public string PhuongThucTT { get; set; } = "";
     public DatSan? DatSan { get; set; }

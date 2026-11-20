@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace SportZone.Data;
 
-// Dùng cho lệnh "dotnet ef migrations add ..." (chỉ lúc thiết kế).
+// Dùng cho lệnh "dotnet ef migrations add ..." (chỉ lúc thiết kế)
 public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<SportZoneDbContext>
 {
     public SportZoneDbContext CreateDbContext(string[] args)

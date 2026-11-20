@@ -8,7 +8,7 @@ namespace SportZone.Business;
 
 public static class DangKyDichVu
 {
-    // Dùng chung cho Web (Program.cs) và Desktop. Đọc "DatabaseProvider" và "ConnectionStrings:SportZone" từ appsettings.json.
+    // Dùng chung cho Web (Program.cs) và Desktop
     public static IServiceCollection AddSportZone(this IServiceCollection services, IConfiguration config)
     {
         var provider = config["DatabaseProvider"];

@@ -1,19 +1,19 @@
 namespace SportZone.Business;
 
-// Quy tắc nghiệp vụ BR01–BR10 trong PRD, gom một chỗ để Web và Desktop dùng chung.
+// Quy tắc nghiệp vụ BR01–BR10 trong PRD, gom một chỗ để Web và Desktop dùng chung
 public static class QuyTac
 {
-    public static readonly TimeOnly GioMoCua = new(5, 0);       // BR01
-    public static readonly TimeOnly GioDongCua = new(23, 0);    // BR01
-    public const int PhutMoiBlock = 30;                          // BR02
-    public const int SoPhutToiThieu = 60;                        // BR02
-    public const double SoGioHuyToiThieu = 3;                    // BR07
-    public const decimal TiLeCoc = 0.3m;                         // BR09
+    public static readonly TimeOnly GioMoCua = new(5, 0); // BR01
+    public static readonly TimeOnly GioDongCua = new(23, 0); // BR01
+    public const int PhutMoiBlock = 30; // BR02
+    public const int SoPhutToiThieu = 60; // BR02
+    public const double SoGioHuyToiThieu = 3; // BR07
+    public const decimal TiLeCoc = 0.3m; // BR09
 
     public static bool LaCuoiTuan(DateOnly ngay) =>
         ngay.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday; // BR03
 
-    // BR01, BR02 và không đặt giờ đã qua. Trả về null nếu hợp lệ.
+    // BR01, BR02 và không đặt giờ đã qua, trả về null nếu hợp lệ
     public static string? KiemTraKhungGio(DateOnly ngay, TimeOnly batDau, TimeOnly ketThuc, DateTime bayGio)
     {
         if (batDau < GioMoCua || ketThuc > GioDongCua || ketThuc <= batDau)

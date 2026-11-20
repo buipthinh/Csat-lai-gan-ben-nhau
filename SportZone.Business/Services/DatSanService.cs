@@ -150,12 +150,11 @@ public class DatSanService
         }
         catch (Exception ex) when (ex is DbUpdateException || ex.GetType().Name == "SqlException")
         {
-            // Deadlock hoặc xung đột giữa hai transaction đặt cùng lúc
             return KetQua<DatSan>.Loi("Khung giờ này vừa có người đặt. Vui lòng chọn giờ khác.");
         }
     }
 
-    // ---------- Chuyển trạng thái đơn ----------
+    // Chuyển trạng thái đơn
 
     private KetQua DoiTrangThai(int maDon, string[] tuTrangThai, Action<DatSan> capNhat, string thongBao)
     {

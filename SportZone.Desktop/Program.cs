@@ -30,8 +30,7 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Không kết nối được cơ sở dữ liệu.\n\n" + ex.Message,
-                "SportZone", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Không kết nối được cơ sở dữ liệu.\n\n" + ex.Message, "SportZone", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
 

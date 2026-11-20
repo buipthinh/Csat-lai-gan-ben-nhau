@@ -1,6 +1,6 @@
 namespace SportZone.Business;
 
-// Kết quả trả về cho tầng giao diện: thành công hoặc thông báo lỗi nghiệp vụ dễ hiểu.
+// Kết quả trả về cho tầng giao diện: thành công hoặc thông báo lỗi nghiệp vụ dễ hiểu
 public class KetQua
 {
     public bool ThanhCong { get; init; }

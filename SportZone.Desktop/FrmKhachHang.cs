@@ -49,11 +49,9 @@ public class FrmKhachHang : FrmCrudBase<KhachHang>
         Luoi.Rows.Clear();
         foreach (var k in Program.Lay<KhachHangService>().TimKiem(_tuKhoa.Text))
         {
-            var i = Luoi.Rows.Add(k.MaKH, k.HoTen, k.SDT, k.Email,
-                k.MatKhauHash == null ? "Chưa có" : "Đã có", dons.LichSuCuaKhach(k.MaKH).Count, k.TrangThai);
+            var i = Luoi.Rows.Add(k.MaKH, k.HoTen, k.SDT, k.Email, k.MatKhauHash == null ? "Chưa có" : "Đã có", dons.LichSuCuaKhach(k.MaKH).Count, k.TrangThai);
             Luoi.Rows[i].Tag = k;
-            if (k.TrangThai == TrangThaiTaiKhoan.DaKhoa)
-                Luoi.Rows[i].Cells[6].Style.BackColor = Color.FromArgb(248, 215, 218);
+            if (k.TrangThai == TrangThaiTaiKhoan.DaKhoa) Luoi.Rows[i].Cells[6].Style.BackColor = Color.FromArgb(248, 215, 218);
         }
     }
 

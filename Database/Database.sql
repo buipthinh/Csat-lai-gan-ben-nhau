@@ -1,39 +1,28 @@
-﻿/* =====================================================================
-   SPORTZONE - SCRIPT TẠO CƠ SỞ DỮ LIỆU (SQL Server 2019 trở lên / LocalDB)
-   ---------------------------------------------------------------------
-   Nội dung:
-     Phần 1. Tạo database SportZone
-     Phần 2. Tạo 12 bảng, khóa chính, khóa ngoại, UNIQUE, CHECK, index
-             (sinh từ migration EF Core "KhoiTao", khớp 100% với code C#)
-     Phần 3. Dữ liệu mẫu: 2 vai trò, 2 nhân viên, 4 khách hàng, 5 loại sân,
-             13 sân, 3 khung giờ, 30 mức giá, 6 dịch vụ, 766 đơn đặt sân,
-             647 hóa đơn. Ngày của đơn được tính tương đối so với ngày chạy
-             script (30 ngày trước đến 3 ngày sau) nên luôn có số liệu mới.
-     Phần 4. View phục vụ báo cáo và câu lệnh kiểm tra
+﻿/*
+    Nội dung:
+        1. Tạo database SportZone
+        2. Tạo 12 bảng
+        3. Dữ liệu mẫu: 2 vai trò, 2 nhân viên, 4 khách hàng, 5 loại sân,
+                13 sân, 3 khung giờ, 30 mức giá, 6 dịch vụ, 766 đơn đặt sân,
+                647 hóa đơn. Ngày của đơn được tính tương đối so với ngày chạy
+                script (30 ngày trước đến 3 ngày sau) nên luôn có số liệu mới
+        4. View phục vụ báo cáo và câu lệnh kiểm tra
 
-   Tài khoản mẫu (mật khẩu đã băm BCrypt trong bảng):
-     Desktop: admin / admin123 (Quản lý)    nhanvien / nv123456 (Nhân viên)
-     Web    : 0901234567 / 123456           0912345678 / 123456
-
-   Cách chạy: mở file trong SQL Server Management Studio (hoặc Azure Data
-   Studio), kết nối tới (localdb)\MSSQLLocalDB, bấm Execute (F5).
-   Nếu muốn tạo lại từ đầu, bỏ chú thích 3 dòng DROP ở Phần 1.
-   ===================================================================== */
+    Tài khoản mẫu (mật khẩu đã băm BCrypt trong bảng):
+        Desktop: admin / admin123 (Quản lý); nhanvien / nv123456 (Nhân viên)
+        Web: 0901234567 / 123456; 0912345678 / 123456
+*/
 
 SET NOCOUNT ON;
 GO
 
-/* ---------------- PHẦN 1. TẠO DATABASE ---------------- */
+/* TẠO DATABASE */
 USE master;
-GO
--- IF DB_ID(N'SportZone') IS NOT NULL
---     ALTER DATABASE SportZone SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
--- IF DB_ID(N'SportZone') IS NOT NULL DROP DATABASE SportZone;
 GO
 IF DB_ID(N'SportZone') IS NOT NULL
 BEGIN
-    RAISERROR(N'Database SportZone đã tồn tại. Bỏ chú thích các dòng DROP ở Phần 1 nếu muốn tạo lại.', 16, 1);
-    SET NOEXEC ON;   -- dừng toàn bộ script, không đụng vào dữ liệu đang có
+    RAISERROR(N'Database SportZone đã tồn tại.', 16, 1);
+    SET NOEXEC ON;
 END
 GO
 CREATE DATABASE SportZone COLLATE Vietnamese_CI_AS;
@@ -41,7 +30,7 @@ GO
 USE SportZone;
 GO
 
-/* ---------------- PHẦN 2. TẠO BẢNG ---------------- */
+/* TẠO BẢNG */
 IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
 BEGIN
     CREATE TABLE [__EFMigrationsHistory] (
@@ -52,6 +41,7 @@ BEGIN
 END;
 GO
 
+-- BẢNG DỊCH VỤ
 BEGIN TRANSACTION;
 CREATE TABLE [DichVu] (
     [MaDV] int NOT NULL IDENTITY,
@@ -61,6 +51,7 @@ CREATE TABLE [DichVu] (
     CONSTRAINT [PK_DichVu] PRIMARY KEY ([MaDV])
 );
 
+-- BẢNG KHÁCH HÀNG
 CREATE TABLE [KhachHang] (
     [MaKH] int NOT NULL IDENTITY,
     [HoTen] nvarchar(100) NOT NULL,
@@ -72,6 +63,7 @@ CREATE TABLE [KhachHang] (
     CONSTRAINT [PK_KhachHang] PRIMARY KEY ([MaKH])
 );
 
+-- BẢNG KHUNG GIỜ
 CREATE TABLE [KhungGio] (
     [MaKhungGio] int NOT NULL IDENTITY,
     [TenKhungGio] nvarchar(50) NOT NULL,
@@ -81,6 +73,7 @@ CREATE TABLE [KhungGio] (
     CONSTRAINT [CK_KhungGio_Gio] CHECK (GioKetThuc > GioBatDau)
 );
 
+-- BẢNG LOẠI SÂN
 CREATE TABLE [LoaiSan] (
     [MaLoai] int NOT NULL IDENTITY,
     [TenLoai] nvarchar(50) NOT NULL,
@@ -88,12 +81,14 @@ CREATE TABLE [LoaiSan] (
     CONSTRAINT [PK_LoaiSan] PRIMARY KEY ([MaLoai])
 );
 
+-- BẢNG VAI TRÒ
 CREATE TABLE [VaiTro] (
     [MaVaiTro] int NOT NULL IDENTITY,
     [TenVaiTro] nvarchar(50) NOT NULL,
     CONSTRAINT [PK_VaiTro] PRIMARY KEY ([MaVaiTro])
 );
 
+-- BẢNG BẢNG GIÁ
 CREATE TABLE [BangGia] (
     [MaLoai] int NOT NULL,
     [MaKhungGio] int NOT NULL,
@@ -105,6 +100,7 @@ CREATE TABLE [BangGia] (
     CONSTRAINT [FK_BangGia_LoaiSan_MaLoai] FOREIGN KEY ([MaLoai]) REFERENCES [LoaiSan] ([MaLoai]) ON DELETE NO ACTION
 );
 
+-- BẢNG SÂN
 CREATE TABLE [San] (
     [MaSan] int NOT NULL IDENTITY,
     [TenSan] nvarchar(50) NOT NULL,
@@ -116,6 +112,7 @@ CREATE TABLE [San] (
     CONSTRAINT [FK_San_LoaiSan_MaLoai] FOREIGN KEY ([MaLoai]) REFERENCES [LoaiSan] ([MaLoai]) ON DELETE NO ACTION
 );
 
+-- BẢNG NHÂN VIÊN
 CREATE TABLE [NhanVien] (
     [MaNV] int NOT NULL IDENTITY,
     [HoTen] nvarchar(100) NOT NULL,
@@ -127,6 +124,7 @@ CREATE TABLE [NhanVien] (
     CONSTRAINT [FK_NhanVien_VaiTro_MaVaiTro] FOREIGN KEY ([MaVaiTro]) REFERENCES [VaiTro] ([MaVaiTro]) ON DELETE NO ACTION
 );
 
+-- BẢNG LỊCH ĐỊNH KỲ
 CREATE TABLE [LichDinhKy] (
     [MaLich] int NOT NULL IDENTITY,
     [MaKH] int NOT NULL,
@@ -143,6 +141,7 @@ CREATE TABLE [LichDinhKy] (
     CONSTRAINT [FK_LichDinhKy_San_MaSan] FOREIGN KEY ([MaSan]) REFERENCES [San] ([MaSan]) ON DELETE NO ACTION
 );
 
+-- BẢNG ĐẶT SÂN
 CREATE TABLE [DatSan] (
     [MaDatSan] int NOT NULL IDENTITY,
     [MaKH] int NOT NULL,
@@ -164,6 +163,7 @@ CREATE TABLE [DatSan] (
     CONSTRAINT [FK_DatSan_San_MaSan] FOREIGN KEY ([MaSan]) REFERENCES [San] ([MaSan]) ON DELETE NO ACTION
 );
 
+-- BẢNG CHI TIẾT DỊCH VỤ
 CREATE TABLE [ChiTietDichVu] (
     [MaDatSan] int NOT NULL,
     [MaDV] int NOT NULL,
@@ -175,6 +175,7 @@ CREATE TABLE [ChiTietDichVu] (
     CONSTRAINT [FK_ChiTietDichVu_DichVu_MaDV] FOREIGN KEY ([MaDV]) REFERENCES [DichVu] ([MaDV]) ON DELETE NO ACTION
 );
 
+-- BẢNG HÓA ĐƠN
 CREATE TABLE [HoaDon] (
     [MaHD] int NOT NULL IDENTITY,
     [MaDatSan] int NOT NULL,
@@ -222,7 +223,7 @@ VALUES (N'20261026150259_KhoiTao', N'10.0.14'),
 COMMIT;
 GO
 
-/* ---------------- PHẦN 3. DỮ LIỆU MẪU ---------------- */
+/* DỮ LIỆU MẪU */
 BEGIN TRANSACTION;
 DECLARE @HomNay date = CAST(GETDATE() AS date);
 
@@ -2147,7 +2148,7 @@ SET IDENTITY_INSERT [HoaDon] OFF;
 COMMIT;
 GO
 
-/* ---------------- PHẦN 4. VIEW BÁO CÁO ---------------- */
+/* VIEW BÁO CÁO */
 
 -- Doanh thu theo ngày (UC29): doanh thu = tiền sân + dịch vụ, ghi trong HoaDon.TongTien
 CREATE VIEW vw_DoanhThuTheoNgay AS
@@ -2170,7 +2171,7 @@ JOIN KhachHang k ON k.MaKH = d.MaKH
 WHERE d.TrangThai <> N'Đã hủy';
 GO
 
-/* ---------------- KIỂM TRA SAU KHI CHẠY ---------------- */
+/* KIỂM TRA SAU KHI CHẠY */
 SELECT 'VaiTro' AS Bang, COUNT(*) AS SoDong FROM VaiTro
 UNION ALL SELECT 'NhanVien', COUNT(*) FROM NhanVien
 UNION ALL SELECT 'KhachHang', COUNT(*) FROM KhachHang

@@ -36,7 +36,7 @@ public class KhachHangService
         return KetQua<KhachHang>.Ok(kh, "Đã lưu khách hàng.");
     }
 
-    // Khóa hoặc mở lại tài khoản khách (thay cho xóa, vì khách đã có đơn thì không xóa được)
+    // Khóa hoặc mở lại tài khoản khách
     public KetQua KhoaMoKhach(int maKH)
     {
         using var db = _dbf.CreateDbContext();

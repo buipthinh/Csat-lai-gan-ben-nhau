@@ -16,9 +16,9 @@ public class TaiKhoanService
     private static string? KiemTraMatKhauMoi(string matKhau) =>
         matKhau.Length < 6 ? "Mật khẩu phải có ít nhất 6 ký tự." : null;
 
-    // ---------- Khách hàng (Web) ----------
+    // Khách hàng (Web)
 
-    // UC05. Nếu SĐT đã được nhân viên tạo tại quầy mà chưa có mật khẩu thì cho kích hoạt tài khoản đó.
+    // UC05: Nếu SĐT đã được nhân viên tạo tại quầy mà chưa có mật khẩu thì cho kích hoạt tài khoản đó
     public KetQua<KhachHang> DangKy(string hoTen, string sdt, string? email, string matKhau)
     {
         hoTen = hoTen.Trim(); sdt = ChuanHoaSdt(sdt);
@@ -86,7 +86,7 @@ public class TaiKhoanService
         return KetQua.Ok("Đã đổi mật khẩu.");
     }
 
-    // ---------- Nhân viên (Desktop) ----------
+    // Nhân viên (Desktop)
 
     // UC12
     public KetQua<NhanVien> DangNhapNhanVien(string tenDangNhap, string matKhau)

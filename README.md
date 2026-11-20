@@ -3,6 +3,7 @@
 - Link docs: https://docs.google.com/document/d/1kMyKTvmn33S6bsZioTueAmjSrR7KdsgkJRDUiG8j17I/edit?tab=t.0#heading=h.ut6dxxm6ubv0
 - Link Excel Use cases: https://docs.google.com/spreadsheets/d/1dEZBH5jMHDfvMUY0FQuSr0y0DHqeV7s2D5Bw5SPLPnU/edit?gid=0#gid=0
 - Link Excel Sreens: https://docs.google.com/spreadsheets/d/1BC80vjhIbL75g0hg_Jns7iRCQ8urxaTMsCEheNBINjw/edit?gid=1385038250#gid=1385038250
+- Link Excel Tests: https://docs.google.com/spreadsheets/d/1CoVJcEFf3IryCO9qVUcIOAFkMizF-v1_atR1XssH7QE/edit?gid=2004074828#gid=2004074828 
 
 ## 1. Cấu trúc solutions
 
@@ -15,13 +16,7 @@
 | `SportZone.Tests` | xUnit | 40 test cho các quy tắc nghiệp vụ |
 | `Database/` | Script SQL | `Database.sql`: tạo database, 12 bảng, ràng buộc, dữ liệu mẫu, view báo cáo |
 
-## 2. Yêu cầu môi trường
-
-- .NET 10 SDK
-- SQL Server 2019 trở lên hoặc SQL Server LocalDB (đã cài kèm Visual Studio)
-- Visual Studio 2026 (hoặc Visual Studio 2022 bản 17.14 trở lên có cài .NET 10 SDK), cần cho project WinForms
-
-## 3. Cách chạy
+## 2. Cách chạy
 
 1. Mở `SportZone` bằng Visual Studio Code.
 2. Kiểm tra chuỗi kết nối trong `SportZone.Web/appsettings.json` và `SportZone.Desktop/appsettings.json`:
@@ -38,7 +33,8 @@
 
 ### Cách chạy
 ```
-dotnet run SportZone.Desktop hoặc SportZone.Web
+dotnet run --project SportZone.Desktop 
+dotnet run --project SportZone.Web
 ```
 
 ### Tài khoản có sẵn
@@ -56,7 +52,7 @@ dotnet run SportZone.Desktop hoặc SportZone.Web
 dotnet test SportZone.Tests
 ```
 
-## 4. Quy tắc nghiệp vụ đã cài đặt
+## 3. Quy tắc nghiệp vụ đã cài đặt
 
 | Mã | Quy tắc | Nơi cài đặt |
 |---|---|---|
@@ -73,7 +69,7 @@ dotnet test SportZone.Tests
 Trạng thái đơn đi theo đúng vòng: **Chờ xác nhận -> Đã xác nhận -> Đang chơi -> Hoàn thành**, hoặc **Đã hủy**.
 Đơn đặt tại quầy được xác nhận ngay và không thu cọc.
 
-## 5. Màn hình chính
+## 4. Màn hình chính
 
 **Web (khách hàng):** trang chủ kèm ô tìm sân trống, danh sách sân theo môn, chi tiết sân với lưới giờ 30 phút
 (ô xám là đã có người đặt), trang xác nhận hiển thị chi tiết tiền sân từng khung giờ và tiền cọc,
@@ -86,7 +82,7 @@ check-in, thêm dịch vụ, thanh toán và in hóa đơn (xem trước bằng 
 **Desktop (thêm cho quản lý):** loại sân, sân kèm chuyển bảo trì, khung giờ, bảng giá, dịch vụ,
 tài khoản nhân viên, và thống kê doanh thu, tỉ lệ lấp đầy, khung giờ đông khách (biểu đồ cột vẽ bằng GDI+).
 
-## 6. Ghi chú kỹ thuật
+## 5. Ghi chú kỹ thuật
 
 - Mật khẩu băm bằng **BCrypt**, không lưu mật khẩu thô.
 - Mỗi service tạo `DbContext` riêng qua `IDbContextFactory`, nhờ vậy dùng được cho cả web (nhiều request)

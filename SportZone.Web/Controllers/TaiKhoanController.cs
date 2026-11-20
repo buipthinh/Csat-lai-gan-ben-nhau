@@ -72,6 +72,8 @@ public class TaiKhoanController : Controller
     [Authorize, HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> ThongTin(ThongTinVM vm)
     {
+        //Ô SĐT bị disabled nên không gửi lên, lấy lại để form báo lỗi vẫn hiện SĐT
+        vm.SDT = _taiKhoan.LayKhach(User.MaKH()!.Value)?.SDT ?? "";
         if (!ModelState.IsValid) return View(vm);
         var kq = _taiKhoan.CapNhatThongTin(User.MaKH()!.Value, vm.HoTen, vm.Email);
         if (!kq.ThanhCong) { ModelState.AddModelError("", kq.ThongBao); return View(vm); }

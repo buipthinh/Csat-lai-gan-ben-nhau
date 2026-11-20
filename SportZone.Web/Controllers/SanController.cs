@@ -26,7 +26,7 @@ public class SanController : Controller
         {
             MaLoai = maLoai,
             LoaiSans = _danhMuc.DanhSachLoaiSan(),
-            Sans = _danhMuc.DanhSachSan(maLoai),
+            Sans = _danhMuc.DanhSachSan(maLoai, chiHoatDong: true),
             GiaTu = GiaThapNhat(_danhMuc)
         };
         return View(vm);

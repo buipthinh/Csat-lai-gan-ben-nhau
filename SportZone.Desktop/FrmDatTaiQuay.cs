@@ -9,7 +9,7 @@ public class FrmDatTaiQuay : Form
 {
     private readonly TextBox _txtSdt = new() { Left = 130, Top = 48, Width = 130, Font = Ui.FontThuong };
     private readonly TextBox _txtHoTen = new() { Left = 130, Top = 82, Width = 230, Font = Ui.FontThuong };
-    private readonly Label _lblKhach = new() { Left = 270, Top = 51, Width = 230, AutoSize = false, ForeColor = Color.Gray, Font = Ui.FontThuong };
+    private readonly Label _lblKhach = new() { Left = 366, Top = 51, Width = 250, AutoSize = false, ForeColor = Color.Gray, Font = Ui.FontThuong };
     private readonly ComboBox _cbSan = new() { Left = 130, Top = 126, Width = 230, DropDownStyle = ComboBoxStyle.DropDownList, Font = Ui.FontThuong };
     private readonly DateTimePicker _ngay = Ui.ChonNgay(130, 160);
     private readonly ComboBox _bd = Ui.ComboGio(130, 194);
@@ -22,17 +22,17 @@ public class FrmDatTaiQuay : Form
     public FrmDatTaiQuay(int? maSan, DateOnly? ngay, TimeOnly? gioBatDau)
     {
         Text = "Đặt sân tại quầy";
-        ClientSize = new Size(520, 350);
+        ClientSize = new Size(630, 350);   // SỬA: rộng thêm để chữ gợi ý khách không bị nút đè
         StartPosition = FormStartPosition.CenterParent;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = MinimizeBox = false;
         BackColor = Color.White;
 
-        var nutTim = Ui.Nut("Tìm khách", 370, 46, 90);
+        var nutTim = Ui.Nut("Tìm khách", 268, 46, 90);   // SỬA: nút sát ô SĐT, chữ gợi ý nằm bên phải nút
         nutTim.Click += (_, _) => TimKhach();
-        var nutTao = Ui.Nut("Tạo đơn", 370, 310, 130, chinh: true);
+        var nutTao = Ui.Nut("Tạo đơn", 480, 310, 130, chinh: true);   // SỬA
         nutTao.Click += (_, _) => TaoDon();
-        var nutDong = Ui.Nut("Đóng", 270, 310, 90);
+        var nutDong = Ui.Nut("Đóng", 380, 310, 90);   // SỬA
         nutDong.Click += (_, _) => Close();
 
         foreach (var s in Program.Lay<DanhMucService>().DanhSachSan(chiHoatDong: true)) _cbSan.Items.Add(s);

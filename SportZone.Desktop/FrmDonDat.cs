@@ -18,6 +18,7 @@ public class FrmDonDat : Form
         Text = "Tra cứu đơn đặt sân";
         ClientSize = new Size(1000, 600);
         BackColor = Color.White;
+        Padding = new Padding(24, 8, 24, 16);   // SỬA: chừa lề hai bên giống Quản lý khách hàng
 
         _trangThai.Items.Add(MoiTrangThai);
         foreach (var tt in TrangThaiDon.TatCa) _trangThai.Items.Add(tt);

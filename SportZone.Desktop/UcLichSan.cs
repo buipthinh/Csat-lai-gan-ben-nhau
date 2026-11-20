@@ -19,14 +19,29 @@ public class UcLichSan : UserControl
 
     public UcLichSan()
     {
+        BackColor = Color.White;
+        Padding = new Padding(24, 8, 24, 16);   // SỬA: chừa lề hai bên giống Quản lý khách hàng
         var thanh = new Panel { Dock = DockStyle.Top, Height = 50, BackColor = Color.White };
         var nutHomNay = Ui.Nut("Hôm nay", 430, 11, 80);
         var nutTaiLai = Ui.Nut("Tải lại", 516, 11, 80);
-        var chuDan = new Label
+        // SỬA: chú thích có ô màu thật, lấy đúng màu đang tô trong lưới (Ui.MauTrangThai)
+        var chuDan = new FlowLayoutPanel
         {
-            Text = "■ Chờ xác nhận   ■ Đã xác nhận   ■ Đang chơi   ■ Hoàn thành",
-            Left = 610, Top = 17, AutoSize = true, ForeColor = Color.Gray
+            Left = 610, Top = 14, AutoSize = true, WrapContents = false, BackColor = Color.White
         };
+        foreach (var tt in new[] { TrangThaiDon.ChoXacNhan, TrangThaiDon.DaXacNhan, TrangThaiDon.DangChoi, TrangThaiDon.HoanThanh })
+        {
+            chuDan.Controls.Add(new Label
+            {
+                Width = 16, Height = 16, BackColor = Ui.MauTrangThai(tt),
+                BorderStyle = BorderStyle.FixedSingle, Margin = new Padding(0, 4, 5, 0)
+            });
+            chuDan.Controls.Add(new Label
+            {
+                Text = tt, AutoSize = true, Font = Ui.FontThuong, ForeColor = Color.DimGray,
+                Margin = new Padding(0, 2, 16, 0)
+            });
+        }
         thanh.Controls.AddRange(new Control[]
         {
             Ui.Nhan("Ngày", 12, 12, 55), _ngay, Ui.Nhan("Loại sân", 200, 12, 60), _loai,

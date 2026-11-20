@@ -27,16 +27,6 @@ public class DanhMucTests
     }
 
     [Fact]
-    public void Khong_xoa_san_da_co_don_dat()
-    {
-        using var csdl = new CsdlThu();
-        csdl.DichVuDatSan().DatSanOnline(csdl.MaKhachDauTien(), csdl.MaSanBongDa5, CsdlThu.NgayThuong, new(9, 0), new(10, 0));
-        var kq = csdl.DichVuDanhMuc().XoaSan(csdl.MaSanBongDa5);
-        Assert.False(kq.ThanhCong);
-        Assert.Contains("Bảo trì", kq.ThongBao);
-    }
-
-    [Fact]
     public void Doi_gia_dich_vu_khong_lam_sai_don_cu()
     {
         using var csdl = new CsdlThu();

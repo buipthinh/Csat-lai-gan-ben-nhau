@@ -10,7 +10,7 @@ public class FrmLoaiSan : FrmCrudBase<LoaiSan>
     private readonly Label _luuY = new() {
         Text = "* Lưu ý:\n"
                 + "- Thêm loại sân thì nhấn vào Thêm mới.\n"
-                + "- Nếu muốn thay đổi loại sân, nhấn vào một sân nào đó, sau khi thay đổi nhấn Lưu.",
+                + "- Nếu muốn thay đổi loại sân, nhấn vào một loại sân nào đó, sau khi thay đổi nhấn Lưu.",
         Left = 600, Top = 14, Width = 800, Height = 80,
         ForeColor = Color.Gray,
         Font = new Font("Segoe UI", 13)
@@ -34,16 +34,18 @@ public class FrmLoaiSan : FrmCrudBase<LoaiSan>
         ThemCot("Tên loại sân", 160);
         ThemCot("Số sân", 60);
         ThemCot("Mô tả", 250);
+        ThemCot("Hiển thị", 80); 
     }
 
     protected override void TaiLai()
     {
-        var sans = Program.Lay<Business.Services.DanhMucService>().DanhSachSan();
+        var sans = Program.Lay<Business.Services.DanhMucService>().DanhSachSan(caAn: true);
         Luoi.Rows.Clear();
-        foreach (var l in Program.Lay<Business.Services.DanhMucService>().DanhSachLoaiSan())
+        foreach (var l in Program.Lay<Business.Services.DanhMucService>().DanhSachLoaiSan(caAn: true))
         {
-            var i = Luoi.Rows.Add(l.MaLoai, l.TenLoai, sans.Count(s => s.MaLoai == l.MaLoai), l.MoTa);
+            var i = Luoi.Rows.Add(l.MaLoai, l.TenLoai, sans.Count(s => s.MaLoai == l.MaLoai), l.MoTa, ChuHienThi(l.DaAn));
             Luoi.Rows[i].Tag = l;
+            ToMauDongAn(i, l.DaAn);
         }
     }
 
@@ -57,9 +59,13 @@ public class FrmLoaiSan : FrmCrudBase<LoaiSan>
         return kq.ThanhCong;
     }
 
+    protected override string ChuNutXoa => "Ẩn / Hiện";
+    protected override string CauHoiXoa => HoiAnHien(DangChon?.DaAn == true, $"loại sân {DangChon?.TenLoai}",
+        "Khách và nhân viên sẽ không thấy, không đặt được các sân thuộc loại này.");
+
     protected override bool Xoa()
     {
-        var kq = Program.Lay<Business.Services.DanhMucService>().XoaLoaiSan(DangChon!.MaLoai);
+        var kq = Program.Lay<Business.Services.DanhMucService>().AnHienLoaiSan(DangChon!.MaLoai);
         kq.HienKetQua();
         return kq.ThanhCong;
     }

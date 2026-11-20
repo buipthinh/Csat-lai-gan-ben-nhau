@@ -131,16 +131,18 @@ public class DanhMucService
     }
 
     // Bảng giá
-    public List<BangGia> BangGiaCuaLoai(int maLoai)
-    {
+    public List<BangGia> BangGiaCuaLoai(int maLoai) {
         using var db = _dbf.CreateDbContext();
-                return db.BangGias.AsNoTracking().Where(g => !g.KhungGio!.DaAn).ToList();
+        return db.BangGias.AsNoTracking()
+            .Where(g => g.MaLoai == maLoai && !g.KhungGio!.DaAn)
+            .OrderBy(g => g.LaCuoiTuan).ToList();
     }
 
-    public List<BangGia> TatCaBangGia()
-    {
+    public List<BangGia> TatCaBangGia(bool caAn = false) {
         using var db = _dbf.CreateDbContext();
-        return db.BangGias.AsNoTracking().ToList();
+        return db.BangGias.AsNoTracking()
+            .Where(g => caAn || (!g.KhungGio!.DaAn && !g.LoaiSan!.DaAn))
+            .ToList();
     }
 
     public KetQua LuuGia(int maLoai, int maKhungGio, bool laCuoiTuan, decimal gia)

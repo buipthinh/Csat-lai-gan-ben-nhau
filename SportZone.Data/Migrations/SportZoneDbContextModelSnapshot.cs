@@ -141,6 +141,9 @@ namespace SportZone.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaDV"));
 
+                    b.Property<bool>("DaAn")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("DonGia")
                         .HasPrecision(18)
                         .HasColumnType("decimal(18,0)");
@@ -250,6 +253,9 @@ namespace SportZone.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaKhungGio"));
 
+                    b.Property<bool>("DaAn")
+                        .HasColumnType("bit");
+
                     b.Property<TimeOnly>("GioBatDau")
                         .HasColumnType("time");
 
@@ -320,6 +326,9 @@ namespace SportZone.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaLoai"));
 
+                    b.Property<bool>("DaAn")
+                        .HasColumnType("bit");
+
                     b.Property<string>("MoTa")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -383,6 +392,9 @@ namespace SportZone.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaSan"));
+
+                    b.Property<bool>("DaAn")
+                        .HasColumnType("bit");
 
                     b.Property<string>("HinhAnh")
                         .HasMaxLength(255)

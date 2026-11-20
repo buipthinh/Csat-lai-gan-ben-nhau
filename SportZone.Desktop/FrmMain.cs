@@ -59,9 +59,7 @@ public class FrmMain : Form
             AutoSize = false,
             Width = 190,
             BackColor = MauNen,
-            ForeColor = Color.Black,
-            Padding = new Padding(0, 12, 0, 0),
-            Renderer = new ToolStripProfessionalRenderer(new MauMenu())
+            Padding = new Padding(0, 12, 0, 0)
         };
 
         var mDatSan = new ToolStripMenuItem("&Đặt sân");
@@ -100,13 +98,11 @@ public class FrmMain : Form
             mi.TextAlign = ContentAlignment.MiddleLeft;
             mi.Padding = new Padding(10, 0, 0, 0);
             mi.ForeColor = Color.Black;
-            mi.DropDownDirection = ToolStripDropDownDirection.Right;
             mi.MouseEnter += (_, _) => { if (mi.HasDropDownItems && !mi.DropDown.Visible) mi.ShowDropDown(); };
             mi.MouseUp += (_, _) => { if (mi.HasDropDownItems) menu.BeginInvoke(() => mi.ShowDropDown()); };
             foreach (ToolStripItem con in mi.DropDownItems)
             {
                 con.ForeColor = Color.Black;
-                con.Padding = new Padding(4, 4, 4, 4);
             }
         }
         menu.Paint += (_, e) => e.Graphics.DrawLine(Pens.Gainsboro, menu.Width - 1, 0, menu.Width - 1, menu.Height);
@@ -182,6 +178,8 @@ public class FrmMain : Form
     private class MenuRenderer : ToolStripProfessionalRenderer {
         private static readonly Color XanhNhat = Color.FromArgb(76, 175, 120);
         private static readonly Color XamHover = Color.FromArgb(229, 229, 229);
+
+        public MenuRenderer() : base(new MauMenu()) { }
 
         protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e) {
             if (!e.Item.Selected && !e.Item.Pressed) {

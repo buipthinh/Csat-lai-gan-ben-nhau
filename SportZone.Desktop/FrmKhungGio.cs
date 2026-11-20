@@ -26,15 +26,17 @@ public class FrmKhungGio : FrmCrudBase<KhungGio>
         ThemCot("Tên khung giờ", 180);
         ThemCot("Từ giờ", 80);
         ThemCot("Đến giờ", 80);
+        ThemCot("Hiển thị", 80); 
     }
 
     protected override void TaiLai()
     {
         Luoi.Rows.Clear();
-        foreach (var k in Program.Lay<DanhMucService>().DanhSachKhungGio())
+        foreach (var k in Program.Lay<DanhMucService>().DanhSachKhungGio(caAn: true))
         {
-            var i = Luoi.Rows.Add(k.MaKhungGio, k.TenKhungGio, k.GioBatDau.Gio(), k.GioKetThuc.Gio());
+            var i = Luoi.Rows.Add(k.MaKhungGio, k.TenKhungGio, k.GioBatDau.Gio(), k.GioKetThuc.Gio(), ChuHienThi(k.DaAn));
             Luoi.Rows[i].Tag = k;
+            ToMauDongAn(i, k.DaAn);
         }
     }
 
@@ -58,9 +60,13 @@ public class FrmKhungGio : FrmCrudBase<KhungGio>
         return kq.ThanhCong;
     }
 
+    protected override string ChuNutXoa => "Ẩn / Hiện";
+    protected override string CauHoiXoa => HoiAnHien(DangChon?.DaAn == true, $"khung giờ {DangChon?.TenKhungGio}",
+        "Khoảng giờ này sẽ không nhận đặt sân nữa (đơn đã đặt vẫn giữ).");
+
     protected override bool Xoa()
     {
-        var kq = Program.Lay<DanhMucService>().XoaKhungGio(DangChon!.MaKhungGio);
+        var kq = Program.Lay<DanhMucService>().AnHienKhungGio(DangChon!.MaKhungGio);
         kq.HienKetQua();
         return kq.ThanhCong;
     }

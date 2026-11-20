@@ -31,15 +31,17 @@ public class FrmDichVu : FrmCrudBase<DichVu>
         ThemCot("Tên dịch vụ", 200);
         ThemCot("Đơn vị", 80);
         ThemCot("Đơn giá", 100);
+        ThemCot("Hiển thị", 80);
     }
 
     protected override void TaiLai()
     {
         Luoi.Rows.Clear();
-        foreach (var d in Program.Lay<DanhMucService>().DanhSachDichVu())
+        foreach (var d in Program.Lay<DanhMucService>().DanhSachDichVu(caAn: true))
         {
-            var i = Luoi.Rows.Add(d.MaDV, d.TenDV, d.DonVi, d.DonGia.Vnd());
+            var i = Luoi.Rows.Add(d.MaDV, d.TenDV, d.DonVi, d.DonGia.Vnd(), ChuHienThi(d.DaAn));
             Luoi.Rows[i].Tag = d;
+            ToMauDongAn(i, d.DaAn);
         }
     }
 
@@ -57,9 +59,13 @@ public class FrmDichVu : FrmCrudBase<DichVu>
         return kq.ThanhCong;
     }
 
+    protected override string ChuNutXoa => "Ẩn / Hiện";
+    protected override string CauHoiXoa => HoiAnHien(DangChon?.DaAn == true, $"dịch vụ {DangChon?.TenDV}",
+        "Nhân viên sẽ không thêm được dịch vụ này vào đơn mới (đơn cũ vẫn giữ).");
+
     protected override bool Xoa()
     {
-        var kq = Program.Lay<DanhMucService>().XoaDichVu(DangChon!.MaDV);
+        var kq = Program.Lay<DanhMucService>().AnHienDichVu(DangChon!.MaDV);
         kq.HienKetQua();
         return kq.ThanhCong;
     }

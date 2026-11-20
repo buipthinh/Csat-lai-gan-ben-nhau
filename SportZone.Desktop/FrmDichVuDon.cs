@@ -14,7 +14,10 @@ public class FrmDichVuDon : Form
     public FrmDichVuDon(int maDon)
     {
         _maDon = maDon;
-        _dichVus = Program.Lay<DanhMucService>().DanhSachDichVu();
+        var don = Program.Lay<DatSanService>().ChiTiet(maDon)!;
+        // Dịch vụ đã ẩn thì không thêm mới được, nhưng nếu đơn đã có thì vẫn hiện để sửa số lượng
+        _dichVus = Program.Lay<DanhMucService>().DanhSachDichVu(caAn: true)
+            .Where(d => !d.DaAn || don.ChiTietDichVus.Any(c => c.MaDV == d.MaDV)).ToList();
         Text = $"Dịch vụ của đơn #DS{maDon}";
         ClientSize = new Size(520, 420);
         StartPosition = FormStartPosition.CenterParent;
@@ -26,7 +29,6 @@ public class FrmDichVuDon : Form
         _luoi.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Số lượng", FillWeight = 70, DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleRight } });
         _luoi.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Thành tiền", ReadOnly = true, FillWeight = 100, DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleRight } });
 
-        var don = Program.Lay<DatSanService>().ChiTiet(maDon)!;
         foreach (var dv in _dichVus)
         {
             var sl = don.ChiTietDichVus.FirstOrDefault(c => c.MaDV == dv.MaDV)?.SoLuong ?? 0;

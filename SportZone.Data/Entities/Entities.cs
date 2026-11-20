@@ -73,7 +73,6 @@ public class BangGia
     public decimal GiaMoiGio { get; set; }
     public LoaiSan? LoaiSan { get; set; }
     public KhungGio? KhungGio { get; set; }
-    public bool DaAn { get; set; } 
 }
 
 public class DatSan
@@ -90,7 +89,6 @@ public class DatSan
     public DateTime NgayTao { get; set; }
     public int? MaNVXacNhan { get; set; }
     public int? MaLichDinhKy { get; set; }
-    public bool DaAn { get; set; } 
 
     public KhachHang? KhachHang { get; set; }
     public San? San { get; set; }

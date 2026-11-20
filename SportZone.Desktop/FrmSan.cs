@@ -13,9 +13,9 @@ public class FrmSan : FrmCrudBase<San>
 
     public FrmSan() : base("Quản lý sân")
     {
-        foreach (var l in Program.Lay<DanhMucService>().DanhSachLoaiSan()) _loai.Items.Add(l);
+        foreach (var l in Program.Lay<DanhMucService>().DanhSachLoaiSan(caAn: true)) _loai.Items.Add(l);
         _loai.FormattingEnabled = true;
-        _loai.Format += (_, e) => { if (e.ListItem is LoaiSan l) e.Value = l.TenLoai; };
+        _loai.Format += (_, e) => { if (e.ListItem is LoaiSan l) e.Value = l.DaAn ? $"{l.TenLoai} (đã ẩn)" : l.TenLoai; };
         _trangThai.Items.AddRange(new object[] { TrangThaiSan.HoatDong, TrangThaiSan.BaoTri });
 
         ONhap.Controls.AddRange(new Control[]
@@ -35,15 +35,17 @@ public class FrmSan : FrmCrudBase<San>
         ThemCot("Loại sân", 130);
         ThemCot("Trạng thái", 100);
         ThemCot("Mô tả", 250);
+        ThemCot("Hiển thị", 80);
     }
 
     protected override void TaiLai()
     {
         Luoi.Rows.Clear();
-        foreach (var s in Program.Lay<DanhMucService>().DanhSachSan())
+        foreach (var s in Program.Lay<DanhMucService>().DanhSachSan(caAn: true))
         {
-            var i = Luoi.Rows.Add(s.MaSan, s.TenSan, s.LoaiSan?.TenLoai, s.TrangThai, s.MoTa);
+            var i = Luoi.Rows.Add(s.MaSan, s.TenSan, s.LoaiSan?.TenLoai, s.TrangThai, s.MoTa, ChuHienThi(s.DaAn));
             Luoi.Rows[i].Tag = s;
+            ToMauDongAn(i, s.DaAn);
             if (s.TrangThai == TrangThaiSan.BaoTri) Luoi.Rows[i].Cells[3].Style.BackColor = Color.FromArgb(233, 236, 239);
         }
     }
@@ -72,9 +74,13 @@ public class FrmSan : FrmCrudBase<San>
         return kq.ThanhCong;
     }
 
+    protected override string ChuNutXoa => "Ẩn / Hiện";
+    protected override string CauHoiXoa => HoiAnHien(DangChon?.DaAn == true, DangChon?.TenSan ?? "sân",
+        "Sân sẽ không hiện trên Web, lịch sân và form đặt tại quầy.");
+
     protected override bool Xoa()
     {
-        var kq = Program.Lay<DanhMucService>().XoaSan(DangChon!.MaSan);
+        var kq = Program.Lay<DanhMucService>().AnHienSan(DangChon!.MaSan);
         kq.HienKetQua();
         return kq.ThanhCong;
     }

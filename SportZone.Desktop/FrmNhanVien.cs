@@ -17,22 +17,13 @@ public class FrmNhanVien : FrmCrudBase<NhanVien>
         _vaiTro.FormattingEnabled = true;
         _vaiTro.Format += (_, e) => { if (e.ListItem is VaiTro v) e.Value = v.TenVaiTro; };
 
-        var nutKhoa = Ui.Nut("Khóa / Mở khóa", 480, 48, 160);
-        nutKhoa.Click += (_, _) =>
-        {
-            if (DangChon == null) { Ui.CanhBao("Chọn một tài khoản trước."); return; }
-            var kq = Program.Lay<TaiKhoanService>().KhoaMoNhanVien(DangChon.MaNV, PhienDangNhap.MaNV);
-            kq.HienKetQua();
-            TaiLai();
-        };
-
         ONhap.Controls.AddRange(new Control[]
         {
             Ui.Nhan("Họ tên", 12, 14), _hoTen,
             Ui.Nhan("Tên đăng nhập", 12, 48), _tenDangNhap,
             Ui.Nhan("Vai trò", 12, 82), _vaiTro,
-            Ui.Nhan("Mật khẩu mới", 370, 14, 105), _matKhau, nutKhoa,
-            new Label { Text = "Để trống mật khẩu nếu không muốn đổi.", Left = 480, Top = 86, Width = 260, ForeColor = Color.Gray, Font = Ui.FontThuong }
+            Ui.Nhan("Mật khẩu mới", 370, 14, 105), _matKhau,
+            new Label { Text = "Để trống mật khẩu nếu không muốn đổi.", Left = 480, Top = 48, Width = 260, ForeColor = Color.Gray, Font = Ui.FontThuong }
         });
         KhoiDong();
     }
@@ -76,6 +67,18 @@ public class FrmNhanVien : FrmCrudBase<NhanVien>
         if (_vaiTro.SelectedItem is not VaiTro v) { Ui.CanhBao("Chọn vai trò."); return false; }
         var kq = Program.Lay<TaiKhoanService>().LuuNhanVien(DangChon?.MaNV, _hoTen.Text, _tenDangNhap.Text, v.MaVaiTro,
             string.IsNullOrEmpty(_matKhau.Text) ? null : _matKhau.Text);
+        kq.HienKetQua();
+        return kq.ThanhCong;
+    }
+
+    protected override string ChuNutXoa => "Khóa / Mở khóa";
+    protected override string CauHoiXoa => DangChon?.TrangThai == TrangThaiTaiKhoan.DaKhoa
+        ? $"Mở lại tài khoản của {DangChon.HoTen}?"
+        : $"Khóa tài khoản của {DangChon?.HoTen}? Nhân viên này sẽ không đăng nhập được.";
+
+    protected override bool Xoa()
+    {
+        var kq = Program.Lay<TaiKhoanService>().KhoaMoNhanVien(DangChon!.MaNV, PhienDangNhap.MaNV);
         kq.HienKetQua();
         return kq.ThanhCong;
     }

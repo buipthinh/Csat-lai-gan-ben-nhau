@@ -23,20 +23,23 @@
 
 ## 3. Cách chạy
 
-1. Mở `SportZone` bằng Visual Studio.
+1. Mở `SportZone` bằng Visual Studio Code.
 2. Kiểm tra chuỗi kết nối trong `SportZone.Web/appsettings.json` và `SportZone.Desktop/appsettings.json`:
 
    ```json
    "ConnectionStrings": { "SportZone": "Server=(localdb)\\MSSQLLocalDB;Database=SportZone;Trusted_Connection=True;TrustServerCertificate=True" }
    ```
 
-3. Tạo database: Mở `Database/SportZone_Database.sql` trong SQL Server Management Studio,
+3. Tạo database: Mở `Database/Database.sql` trong SQL Server Management Studio,
      kết nối `(localdb)\MSSQLLocalDB`, bấm Execute. Script tạo database `SportZone`, 12 bảng và dữ liệu mẫu,
      ngày của các đơn tính theo ngày bạn chạy script.
 4. Chạy `SportZone.Web` (hoặc `SportZone.Desktop`). Dữ liệu mẫu gồm: 13 sân thuộc 5 loại, bảng giá, dịch vụ, khách hàng và khoảng 30 ngày đơn đặt sân
    để màn hình thống kê có số liệu.
-5. Muốn chạy hai ứng dụng cùng lúc: nhấp phải Solution → *Set Startup Projects* → *Multiple startup projects*,
-   chọn `SportZone.Web` và `SportZone.Desktop`.
+
+### Cách chạy
+```
+dotnet run SportZone.Desktop hoặc SportZone.Web
+```
 
 ### Tài khoản có sẵn
 
@@ -44,7 +47,7 @@
 |---|---|---|---|
 | Desktop | `admin` | `admin123` | Quản lý (thấy đủ menu danh mục và thống kê) |
 | Desktop | `nhanvien` | `nv123456` | Nhân viên (chỉ đặt sân, khách hàng) |
-| Web | `0901234567` | `123456` | Khách hàng Lê Minh Khoa |
+| Web | `0901234567` | `123456` | Khách hàng Bùi Quang Tín |
 | Web | `0912345678` | `123456` | Khách hàng Phạm Thu Hà |
 
 ### Chạy test
